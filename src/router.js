@@ -24,12 +24,12 @@ export default new Router({
 			component: Home,
 		},
 		{
-			path: '/accounts/:accountId/folders/:filter?/:folderId',
-			name: 'folder',
+			path: '/box/:filter?/:mailboxId',
+			name: 'mailbox',
 			component: Home,
 		},
 		{
-			path: '/accounts/:accountId/folders/:filter?/:folderId/message/:messageUuid/:draftUid?',
+			path: '/box/:filter?/:mailboxId/thread/:threadId/:draftUid?',
 			name: 'message',
 			component: Home,
 		},

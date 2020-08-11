@@ -36,7 +36,7 @@ export default {
 		$route(to, from) {
 			if (
 				from.name === 'message'
-				&& to.name === 'folder'
+				&& to.name === 'mailbox'
 				&& !this.isMobile
 				&& Number.parseInt(from.params.accountId, 10) === Number.parseInt(to.params.accountId, 10)
 				&& from.params.folderId === to.params.folderId
@@ -62,10 +62,9 @@ export default {
 			console.debug('loading first folder of first account', firstAccount.id, firstFolder.id)
 
 			this.$router.replace({
-				name: 'folder',
+				name: 'mailbox',
 				params: {
-					accountId: firstAccount.id,
-					folderId: firstFolder.id,
+					mailboxId: firstFolder.databaseId,
 				},
 			})
 		} else if (this.$route.name === 'home' && accounts.length === 1) {

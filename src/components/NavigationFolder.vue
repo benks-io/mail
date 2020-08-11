@@ -172,10 +172,9 @@ export default {
 		},
 		to() {
 			return {
-				name: 'folder',
+				name: 'mailbox',
 				params: {
-					accountId: this.account.id,
-					folderId: this.folder.id,
+					mailboxId: this.folder.databaseId,
 					filter: this.filter ? this.filter : undefined,
 				},
 			}

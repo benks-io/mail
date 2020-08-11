@@ -177,10 +177,9 @@ export default {
 	methods: {
 		hideMessage() {
 			this.$router.replace({
-				name: 'folder',
+				name: 'mailbox',
 				params: {
-					accountId: this.account.id,
-					folderId: this.folder.id,
+					mailboxId: this.folder.databaseId,
 					filter: this.$route.params.filter ? this.$route.params.filter : undefined,
 				},
 			})

@@ -137,10 +137,9 @@ export default {
 		},
 		firstFolderRoute() {
 			return {
-				name: 'folder',
+				name: 'mailbox',
 				params: {
-					accountId: this.account.id,
-					folderId: this.firstFolder.id,
+					mailboxId: this.firstFolder.databaseId,
 				},
 			}
 		},

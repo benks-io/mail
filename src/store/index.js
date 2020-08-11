@@ -55,6 +55,7 @@ export default new Vuex.Store({
 		folders: {
 			[UNIFIED_INBOX_UID]: {
 				id: UNIFIED_INBOX_ID,
+				databaseId: 'unified',
 				accountId: 0,
 				attributes: ['\\subscribed'],
 				isUnified: true,
@@ -66,6 +67,7 @@ export default new Vuex.Store({
 			},
 			[PRIORITY_INBOX_UID]: {
 				id: PRIORITY_INBOX_ID,
+				databaseId: 'priority',
 				accountId: 0,
 				attributes: ['\\subscribed'],
 				isPriorityInbox: true,
