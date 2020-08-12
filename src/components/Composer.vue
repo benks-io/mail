@@ -405,7 +405,7 @@ export default {
 		},
 	},
 	watch: {
-		'$route.params.messageUuid'() {
+		'$route.params.threadId'() {
 			this.reset()
 		},
 		allRecipients() {

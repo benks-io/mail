@@ -98,7 +98,8 @@ export default {
 	mounted() {
 		// TODO: check if there is a more sane way to query this and if other mailboxes should be fetched as well
 		this.accounts.forEach((account) => {
-			fetchEnvelopes(account.accountId, btoa('INBOX'), 'is:important', undefined, 10).then((messages) => {
+			// TODO: this won't work
+			fetchEnvelopes('unified', 'is:important', undefined, 10).then((messages) => {
 				messages = messages.map((message) => ({ ...message, accountId: account.accountId, mailbox: btoa('INBOX') }))
 				this.messages = this.messages !== null ? [...this.messages, ...messages] : messages
 				this.fetchedAccounts++

@@ -48,7 +48,7 @@ describe('Vuex store actions', () => {
 				accounts: [],
 				getFolder: sinon.stub(),
 				getFolders: sinon.stub(),
-				getEnvelopeById: sinon.stub(),
+				getEnvelopeByUuid: sinon.stub(),
 				getEnvelopes: sinon.stub(),
 			},
 		}
@@ -147,7 +147,7 @@ describe('Vuex store actions', () => {
 				'': reverse(range(21, 40).map(normalizedMessageId(13, 'INBOX'))),
 			},
 		})
-		context.getters.getEnvelopeById
+		context.getters.getEnvelopeByUuid
 			.withArgs(normalizedMessageId(13, 'INBOX', 21))
 			.returns(mockEnvelope(13, 'INBOX', 1))
 		sinon.stub(MessageService, 'fetchEnvelopes').returns(

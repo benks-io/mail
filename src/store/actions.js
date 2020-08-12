@@ -208,16 +208,14 @@ export default {
 			})
 		)
 	},
-	fetchEnvelope({ commit, getters }, uuid) {
-		const { accountId, folderId, uid } = parseUuid(uuid)
-
-		const cached = getters.getEnvelope(accountId, folderId, uid)
+	fetchEnvelope({ commit, getters }, id) {
+		const cached = getters.getEnvelope(id)
 		if (cached) {
-			logger.debug(`using cached value for envelope ${uuid}`)
+			logger.debug(`using cached value for envelope ${id}`)
 			return cached
 		}
 
-		return fetchEnvelope(accountId, folderId, uid).then((envelope) => {
+		return fetchEnvelope(id).then((envelope) => {
 			// Only commit if not undefined (not found)
 			if (envelope) {
 				commit('addEnvelope', {
@@ -231,10 +229,10 @@ export default {
 			return getters.getEnvelope(accountId, folderId, uid)
 		})
 	},
-	fetchEnvelopes({ state, commit, getters, dispatch }, { accountId, folderId, query }) {
-		const folder = getters.getFolder(accountId, folderId)
+	fetchEnvelopes({ state, commit, getters, dispatch }, { mailboxId, query }) {
+		const mailbox = getters.getMailbox(mailboxId)
 
-		if (folder.isUnified) {
+		if (mailbox.isUnified) {
 			const fetchIndividualLists = pipe(
 				map((f) =>
 					dispatch('fetchEnvelopes', {
@@ -247,7 +245,7 @@ export default {
 				andThen(map(sliceToPage))
 			)
 			const fetchUnifiedEnvelopes = pipe(
-				findIndividualFolders(getters.getFolders, folder.specialRole),
+				findIndividualFolders(getters.getFolders, mailbox.specialRole),
 				fetchIndividualLists,
 				andThen(combineEnvelopeLists),
 				andThen(sliceToPage),
@@ -282,23 +280,23 @@ export default {
 					)
 				)
 			)
-		)(accountId, folderId, query, undefined, PAGE_SIZE)
+		)(mailboxId, query, undefined, PAGE_SIZE)
 	},
-	fetchNextEnvelopePage({ commit, getters, dispatch }, { accountId, folderId, query, rec = true }) {
-		const folder = getters.getFolder(accountId, folderId)
+	fetchNextEnvelopePage({ commit, getters, dispatch }, { mailboxId, query, rec = true }) {
+		const mailbox = getters.getMailbox(mailboxId)
 
-		if (folder.isUnified) {
+		if (mailbox.isUnified) {
 			const getIndivisualLists = curry((query, f) => getters.getEnvelopes(f.accountId, f.id, query))
 			const individualCursor = curry((query, f) =>
 				prop('dateInt', last(getters.getEnvelopes(f.accountId, f.id, query)))
 			)
-			const cursor = individualCursor(query, folder)
+			const cursor = individualCursor(query, mailbox)
 
 			if (cursor === undefined) {
 				throw new Error('Unified list has no tail')
 			}
 			const nextLocalUnifiedEnvelopePage = pipe(
-				findIndividualFolders(getters.getFolders, folder.specialRole),
+				findIndividualFolders(getters.getFolders, mailbox.specialRole),
 				map(getIndivisualLists(query)),
 				combineEnvelopeLists,
 				filter(
@@ -319,7 +317,7 @@ export default {
 
 			const foldersToFetch = (accounts) =>
 				pipe(
-					findIndividualFolders(getters.getFolders, folder.specialRole),
+					findIndividualFolders(getters.getFolders, mailbox.specialRole),
 					filter(needsFetch(query, nextLocalUnifiedEnvelopePage(accounts)))
 				)(accounts)
 			const fs = foldersToFetch(getters.accounts)
@@ -357,7 +355,7 @@ export default {
 			return page
 		}
 
-		const list = folder.envelopeLists[normalizedEnvelopeListId(query)]
+		const list = mailbox.envelopeLists[normalizedEnvelopeListId(query)]
 		if (list === undefined) {
 			console.warn("envelope list is not defined, can't fetch next page", accountId, folderId, query)
 			return Promise.resolve([])
@@ -367,13 +365,13 @@ export default {
 			console.error('folder is empty', list)
 			return Promise.reject(new Error('Local folder has no envelopes, cannot determine cursor'))
 		}
-		const lastEnvelope = getters.getEnvelopeById(lastEnvelopeId)
+		const lastEnvelope = getters.getEnvelopeByUuid(lastEnvelopeId)
 		if (typeof lastEnvelope === 'undefined') {
 			return Promise.reject(new Error('Cannot find last envelope. Required for the folder cursor'))
 		}
 
-		return fetchEnvelopes(accountId, folderId, query, lastEnvelope.dateInt, PAGE_SIZE).then((envelopes) => {
-			logger.debug(`fetched ${envelopes.length} messages for the next page of ${accountId}:${folderId}`, {
+		return fetchEnvelopes(mailboxId, query, lastEnvelope.dateInt, PAGE_SIZE).then((envelopes) => {
+			logger.debug(`fetched ${envelopes.length} messages for the next page of mailbox ${mailboxId}`, {
 				envelopes,
 			})
 			envelopes.forEach((envelope) =>
@@ -387,7 +385,8 @@ export default {
 			return envelopes
 		})
 	},
-	syncEnvelopes({ commit, getters, dispatch }, { accountId, folderId, query, init = false }) {
+	syncEnvelopes({ commit, getters, dispatch }, { mailboxId, query, init = false }) {
+		// TODO: use mailboxId
 		const folder = getters.getFolder(accountId, folderId)
 
 		if (folder.isUnified) {

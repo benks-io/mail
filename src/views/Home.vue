@@ -23,10 +23,10 @@ export default {
 	mixins: [isMobile],
 	computed: {
 		activeAccount() {
-			return this.$store.getters.getAccount(this.$route.params.accountId)
+			return this.$store.getters.getAccount(this.activeFolder?.accountId)
 		},
 		activeFolder() {
-			return this.$store.getters.getFolder(this.$route.params.accountId, this.$route.params.folderId)
+			return this.$store.getters.getMailbox(this.$route.params.mailboxId)
 		},
 		menu() {
 			return this.buildMenu()
@@ -38,8 +38,7 @@ export default {
 				from.name === 'message'
 				&& to.name === 'mailbox'
 				&& !this.isMobile
-				&& Number.parseInt(from.params.accountId, 10) === Number.parseInt(to.params.accountId, 10)
-				&& from.params.folderId === to.params.folderId
+				&& from.params.mailboxId === to.params.mailboxId
 				&& from.params.filter === to.params.filter
 			) {
 				logger.warn("navigation from a message to just the folder. we don't want that, do we? let's go back", {
@@ -59,7 +58,7 @@ export default {
 			// FIXME: this assumes that there's at least one folder
 			const firstFolder = this.$store.getters.getFolders(firstAccount.id)[0]
 
-			console.debug('loading first folder of first account', firstAccount.id, firstFolder.id)
+			console.debug('loading first folder of first account', firstAccount.id, firstFolder.databaseId)
 
 			this.$router.replace({
 				name: 'mailbox',
@@ -88,9 +87,8 @@ export default {
 			this.$router.replace({
 				name: 'message',
 				params: {
-					accountId: firstAccount.id,
-					folderId: firstFolder.id,
-					messageUuid: 'new',
+					mailboxId: firstFolder.databaseId,
+					threadId: 'new',
 				},
 				query: {
 					to: this.$route.query.to,
@@ -100,6 +98,8 @@ export default {
 					body: this.$route.query.body,
 				},
 			})
+		} else {
+			console.error('no route condition matched')
 		}
 	},
 	methods: {
@@ -108,9 +108,8 @@ export default {
 			this.$router.push({
 				name: 'message',
 				params: {
-					accountId: this.$route.params.accountId,
-					folderId: this.$route.params.folderId,
-					messageUuid: 'new',
+					mailboxId: this.$route.params.mailboxId,
+					threadId: 'new',
 				},
 			})
 		},

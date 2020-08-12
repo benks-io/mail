@@ -177,9 +177,8 @@ export default {
 		$route(to, from) {
 			if (
 				from.name === to.name
-				&& Number.parseInt(from.params.accountId, 10) === Number.parseInt(to.params.accountId, 10)
-				&& from.params.folderId === to.params.folderId
-				&& from.params.messageUuid === to.params.messageUuid
+				&& from.params.mailboxId === to.params.mailboxId
+				&& from.params.threadId === to.params.threadId
 				&& from.params.filter === to.params.filter
 			) {
 				logger.debug('navigated but the message is still the same')
@@ -201,17 +200,17 @@ export default {
 			this.replyRecipient = {}
 			this.replySubject = ''
 
-			const messageUuid = this.$route.params.messageUuid
+			const threadId = this.$route.params.threadId
 
 			try {
 				const [envelope, message] = await Promise.all([
-					this.$store.dispatch('fetchEnvelope', messageUuid),
-					this.$store.dispatch('fetchMessage', messageUuid),
+					this.$store.dispatch('fetchEnvelope', threadId),
+					this.$store.dispatch('fetchMessage', threadId),
 				])
 				logger.debug('envelope and message fetched', { envelope, message })
 				// TODO: add timeout so that message isn't flagged when only viewed
-				// for a few seconds
-				if (message && message.uuid !== this.$route.params.messageUuid) {
+				//       for a few seconds
+				if (message && message.databaseId !== this.$route.params.threadId) {
 					logger.debug("User navigated away, loaded message won't be shown nor flagged as seen")
 					return
 				}
@@ -220,7 +219,7 @@ export default {
 				this.message = message
 
 				if (envelope === undefined || message === undefined) {
-					logger.info('message could not be found', { messageUuid, envelope, message })
+					logger.info('message could not be found', { threadId, envelope, message })
 					this.errorMessage = getRandomMessageErrorMessage()
 					this.loading = false
 					return
@@ -240,7 +239,7 @@ export default {
 					return this.$store.dispatch('toggleEnvelopeSeen', envelope)
 				}
 			} catch (error) {
-				logger.error('could not load message ', { messageUuid, error })
+				logger.error('could not load message ', { threadId, error })
 				if (error.isError) {
 					this.errorMessage = t('mail', 'Could not load your message')
 					this.error = error
@@ -252,9 +251,8 @@ export default {
 			this.$router.push({
 				name: 'message',
 				params: {
-					accountId: this.$route.params.accountId,
-					folderId: this.$route.params.folderId,
-					messageUuid: 'reply',
+					mailboxId: this.$route.params.mailboxId,
+					threadId: 'reply',
 					filter: this.$route.params.filter ? this.$route.params.filter : undefined,
 				},
 				query: {
@@ -266,9 +264,8 @@ export default {
 			this.$router.push({
 				name: 'message',
 				params: {
-					accountId: this.$route.params.accountId,
-					folderId: this.$route.params.folderId,
-					messageUuid: 'replyAll',
+					mailboxId: this.$route.params.mailboxId,
+					threadId: 'replyAll',
 					filter: this.$route.params.filter ? this.$route.params.filter : undefined,
 				},
 				query: {
@@ -280,9 +277,8 @@ export default {
 			this.$router.push({
 				name: 'message',
 				params: {
-					accountId: this.$route.params.accountId,
-					folderId: this.$route.params.folderId,
-					messageUuid: 'new',
+					mailboxId: this.$route.params.mailboxId,
+					threadId: 'new',
 					filter: this.$route.params.filter ? this.$route.params.filter : undefined,
 				},
 				query: {
@@ -297,7 +293,7 @@ export default {
 			this.$store.dispatch('toggleEnvelopeJunk', this.envelope)
 		},
 		onDelete() {
-			this.$emit('delete', this.envelope.uid)
+			this.$emit('delete', this.envelope.databaseId)
 			this.$store.dispatch('deleteMessage', {
 				accountId: this.message.accountId,
 				folderId: this.message.folderId,

@@ -119,11 +119,10 @@ export default {
 		onNewMessage() {
 			const accountId = this.$route.params.accountId || this.$store.getters.accounts[0].id
 
-			// FIXME: this assumes that there's at least one folder
-			const folderId = this.$route.params.folderId || this.$store.getters.getFolders(accountId)[0].id
+			const mailboxId = this.$route.params.mailboxId || this.$store.getters.getFolders(accountId)[0]?.databaseId
 			if (
 				this.$router.currentRoute.name === 'message'
-				&& this.$router.currentRoute.params.messageUuid === 'new'
+				&& this.$router.currentRoute.params.getMailboxes === 'new'
 			) {
 				// If we already show the composer, navigating to it would be pointless (and doesn't work)
 				// instead trigger an event to reset the composer
@@ -135,10 +134,9 @@ export default {
 				.push({
 					name: 'message',
 					params: {
-						accountId,
-						folderId,
+						mailboxId,
 						filter: this.$route.params.filter ? this.$route.params.filter : undefined,
-						messageUuid: 'new',
+						threadId: 'new',
 					},
 				})
 				.catch((err) => {

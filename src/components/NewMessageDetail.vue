@@ -69,7 +69,7 @@ export default {
 				const message = this.original
 				logger.debug('forwarding or replying to message', { message })
 
-				if (this.$route.params.messageUuid === 'reply') {
+				if (this.$route.params.threadId === 'reply') {
 					logger.debug('simple reply')
 
 					return {
@@ -81,7 +81,7 @@ export default {
 						originalBody: this.originalBody,
 						replyTo: message,
 					}
-				} else if (this.$route.params.messageUuid === 'replyAll') {
+				} else if (this.$route.params.threadId === 'replyAll') {
 					logger.debug('replying to all', { original: this.original })
 					const account = this.$store.getters.getAccount(message.accountId)
 					const recipients = buildReplyRecipients(message, {
@@ -265,9 +265,8 @@ export default {
 						this.$router.replace({
 							name: 'message',
 							params: {
-								accountId: this.$route.params.accountId,
-								folderId: this.$route.params.folderId,
-								messageUuid: 'new',
+								mailboxId: this.$route.params.mailboxId,
+								threadId: 'new',
 								draftUid: this.draft.uid,
 							},
 						})

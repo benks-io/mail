@@ -159,9 +159,9 @@ export default {
 		},
 		newMessage() {
 			return (
-				this.$route.params.messageUuid === 'new'
-				|| this.$route.params.messageUuid === 'reply'
-				|| this.$route.params.messageUuid === 'replyAll'
+				this.$route.params.threadId === 'new'
+				|| this.$route.params.threadId === 'reply'
+				|| this.$route.params.threadId === 'replyAll'
 			)
 		},
 	},
@@ -184,8 +184,8 @@ export default {
 				},
 			})
 		},
-		deleteMessage(envelopeUid) {
-			this.bus.$emit('delete', envelopeUid)
+		deleteMessage(id) {
+			this.bus.$emit('delete', id)
 		},
 		onScroll(event) {
 			logger.debug('scroll', { event })

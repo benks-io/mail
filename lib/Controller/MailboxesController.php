@@ -31,7 +31,6 @@ use OCA\Mail\Exception\IncompleteSyncException;
 use OCA\Mail\Exception\MailboxNotCachedException;
 use OCA\Mail\Exception\ServiceException;
 use OCA\Mail\Service\Sync\SyncService;
-use function base64_decode;
 use function is_array;
 use OCA\Mail\Contracts\IMailManager;
 use OCA\Mail\Exception\NotImplemented;
@@ -41,7 +40,7 @@ use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\JSONResponse;
 use OCP\IRequest;
 
-class FoldersController extends Controller {
+class MailboxesController extends Controller {
 
 	/** @var AccountService */
 	private $accountService;
@@ -66,7 +65,7 @@ class FoldersController extends Controller {
 	public function __construct(string $appName,
 								IRequest $request,
 								AccountService $accountService,
-								$UserId,
+								?string $UserId,
 								IMailManager $mailManager,
 								SyncService $syncService) {
 		parent::__construct($appName, $request);
@@ -103,26 +102,28 @@ class FoldersController extends Controller {
 	 * @NoAdminRequired
 	 * @TrapError
 	 *
-	 * @param int $accountId
-	 * @param string $folderId
-	 * @param string $syncToken
+	 * @param int $id
 	 * @param int[] $uids
+	 *
+	 * @param bool $init
+	 * @param string|null $query
 	 *
 	 * @return JSONResponse
 	 * @throws ClientException
 	 * @throws ServiceException
 	 */
-	public function sync(int $accountId, string $folderId, array $uids = [], bool $init = false, string $query = null): JSONResponse {
-		$account = $this->accountService->find($this->currentUserId, $accountId);
-
-		if (empty($accountId) || empty($folderId) || !is_array($uids)) {
+	public function sync(int $id, array $uids = [], bool $init = false, string $query = null): JSONResponse {
+		if (!is_array($uids)) {
 			return new JSONResponse(null, Http::STATUS_BAD_REQUEST);
 		}
+
+		$mailbox = $this->mailManager->getMailbox($this->currentUserId, $id);
+		$account = $this->accountService->find($this->currentUserId, $mailbox->getAccountId());
 
 		try {
 			$syncResponse = $this->syncService->syncMailbox(
 				$account,
-				base64_decode($folderId),
+				$mailbox,
 				Horde_Imap_Client::SYNC_NEWMSGSUIDS | Horde_Imap_Client::SYNC_FLAGSUIDS | Horde_Imap_Client::SYNC_VANISHEDUIDS,
 				array_map(function ($uid) {
 					return (int) $uid;
@@ -143,21 +144,17 @@ class FoldersController extends Controller {
 	 * @NoAdminRequired
 	 * @TrapError
 	 *
-	 * @param int $accountId
-	 * @param string $folderId
+	 * @param string $id
 	 *
 	 * @return JSONResponse
 	 * @throws ClientException
 	 * @throws ServiceException
 	 */
-	public function clearCache(int $accountId, string $folderId): JSONResponse {
-		$account = $this->accountService->find($this->currentUserId, $accountId);
+	public function clearCache(int $id): JSONResponse {
+		$mailbox = $this->mailManager->getMailbox($this->currentUserId, $id);
+		$account = $this->accountService->find($this->currentUserId, $mailbox->getAccountId());
 
-		if (empty($accountId) || empty($folderId)) {
-			return new JSONResponse(null, Http::STATUS_BAD_REQUEST);
-		}
-
-		$this->syncService->clearCache($account, base64_decode($folderId));
+		$this->syncService->clearCache($account, $mailbox);
 		return new JSONResponse(null);
 	}
 
@@ -165,43 +162,37 @@ class FoldersController extends Controller {
 	 * @NoAdminRequired
 	 * @TrapError
 	 *
-	 * @param int $accountId
-	 * @param string $folderId
+	 * @param int $id
+	 *
 	 * @return JSONResponse
 	 *
 	 * @throws ClientException
 	 */
-	public function markAllAsRead(int $accountId, string $folderId): JSONResponse {
-		$account = $this->accountService->find($this->currentUserId, $accountId);
+	public function markAllAsRead(int $id): JSONResponse {
+		$mailbox = $this->mailManager->getMailbox($this->currentUserId, $id);
+		$account = $this->accountService->find($this->currentUserId, $mailbox->getAccountId());
 
-		if (empty($accountId) || empty($folderId)) {
-			return new JSONResponse(null, Http::STATUS_BAD_REQUEST);
-		}
+		$this->mailManager->markFolderAsRead($account, $mailbox);
 
-		$syncResponse = $this->mailManager->markFolderAsRead($account, base64_decode($folderId));
-
-		return new JSONResponse($syncResponse);
+		return new JSONResponse(null);
 	}
 
 	/**
 	 * @NoAdminRequired
 	 * @TrapError
 	 *
-	 * @param int $accountId
-	 * @param string $folderId
+	 * @param int $id
 	 *
 	 * @return JSONResponse
 	 *
 	 * @throws ClientException
+	 * @throws ServiceException
 	 */
-	public function stats(int $accountId, string $folderId): JSONResponse {
-		$account = $this->accountService->find($this->currentUserId, $accountId);
+	public function stats(int $id): JSONResponse {
+		$mailbox = $this->mailManager->getMailbox($this->currentUserId, $id);
+		$account = $this->accountService->find($this->currentUserId, $mailbox->getAccountId());
 
-		if (empty($accountId) || empty($folderId)) {
-			return new JSONResponse(null, Http::STATUS_BAD_REQUEST);
-		}
-
-		$stats = $this->mailManager->getFolderStats($account, base64_decode($folderId));
+		$stats = $this->mailManager->getMailboxStats($account, $mailbox);
 
 		return new JSONResponse($stats);
 	}
@@ -238,13 +229,18 @@ class FoldersController extends Controller {
 	/**
 	 * @NoAdminRequired
 	 * @TrapError
-	 * @param int $accountId
-	 * @param string $folderId
+	 *
+	 * @param int $id
+	 *
+	 * @return JSONResponse
+	 * @throws ClientException
 	 * @throws ServiceException
 	 */
-	public function delete(int $accountId, string $folderId): JSONResponse {
-		$account = $this->accountService->find($this->currentUserId, $accountId);
-		$this->mailManager->deleteMailbox($account,  base64_decode($folderId));
+	public function destroy(int $id): JSONResponse {
+		$mailbox = $this->mailManager->getMailbox($this->currentUserId, $id);
+		$account = $this->accountService->find($this->currentUserId, $mailbox->getAccountId());
+
+		$this->mailManager->deleteMailbox($account,  $mailbox);
 		return new JSONResponse();
 	}
 }

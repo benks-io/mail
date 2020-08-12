@@ -87,7 +87,7 @@ export default {
 			const saveAttachments = (accountId, folderId, messageId) => (directory) => {
 				return saveAttachmentsToFiles(accountId, folderId, messageId, directory)
 			}
-			const { accountId, folderId, uid } = parseUuid(this.$route.params.messageUuid)
+			const { accountId, folderId, uid } = parseUuid(this.$route.params.threadId)
 
 			return picker
 				.pick()

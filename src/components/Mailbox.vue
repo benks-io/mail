@@ -198,13 +198,13 @@ export default {
 
 					// Keep the selected account-folder combination, but navigate to the message
 					// (it's not a bug that we don't use first.accountId and first.folderId here)
+					logger.debug('showing the first message of mailbox ' + this.$route.params.mailboxId)
 					this.$router.replace({
 						name: 'message',
 						params: {
-							accountId: this.$route.params.accountId,
-							folderId: this.$route.params.folderId,
+							mailboxId: this.$route.params.mailboxId,
 							filter: this.$route.params.filter ? this.$route.params.filter : undefined,
-							messageUuid: first.uuid,
+							threadId: first.databaseId
 						},
 					})
 				}
@@ -265,14 +265,14 @@ export default {
 		},
 		handleShortcut(e) {
 			const envelopes = this.envelopes
-			const currentUuid = this.$route.params.messageUuid
+			const currentId = this.$route.params.threadId
 
-			if (!currentUuid) {
+			if (!currentId) {
 				logger.debug('ignoring shortcut: no envelope selected')
 				return
 			}
 
-			const current = envelopes.filter((e) => e.uuid === currentUuid)
+			const current = envelopes.filter((e) => e.databaseId === currentId)
 			if (current.length === 0) {
 				logger.debug('ignoring shortcut: currently displayed messages is not in current envelope list')
 				return
@@ -305,16 +305,15 @@ export default {
 				this.$router.push({
 					name: 'message',
 					params: {
-						accountId: this.$route.params.accountId,
-						folderId: this.$route.params.folderId,
+						mailboxId: this.$route.params.mailboxId,
 						filter: this.$route.params.filter ? this.$route.params.filter : undefined,
-						messageUuid: next.uuid,
+						threadId: next.databaseId,
 					},
 				})
 				break
 			case 'del':
 				logger.debug('deleting', { env })
-				this.onDelete(env.uuid)
+				this.onDelete(env.databaseId)
 				this.$store
 					.dispatch('deleteMessage', {
 						accountId: env.accountId,
@@ -381,14 +380,14 @@ export default {
 				this.refreshing = false
 			}
 		},
-		onDelete(uuid) {
-			const idx = findIndex(propEq('uuid', uuid), this.envelopes)
+		onDelete(id) {
+			const idx = findIndex(propEq('uuid', id), this.envelopes)
 			if (idx === -1) {
 				logger.debug('envelope to delete does not exist in envelope list')
 				return
 			}
 			this.envelopes.splice(idx, 1)
-			if (uuid !== this.$route.params.messageUuid) {
+			if (id !== this.$route.params.threadId) {
 				logger.debug('other message open, not jumping to the next/previous message')
 				return
 			}
@@ -404,10 +403,9 @@ export default {
 			this.$router.push({
 				name: 'message',
 				params: {
-					accountId: this.$route.params.accountId,
-					folderId: this.$route.params.folderId,
+					mailboxId: this.$route.params.mailboxId,
 					filter: this.$route.params.filter ? this.$route.params.filter : undefined,
-					messageUuid: next.uuid,
+					threadId: next.databaseId,
 				},
 			})
 		},
@@ -426,8 +424,7 @@ export default {
 			}
 			try {
 				await this.$store.dispatch('syncEnvelopes', {
-					accountId: this.$route.params.accountId,
-					folderId: this.$route.params.folderId,
+					mailboxId: this.$route.params.mailboxId,
 					query: this.searchQuery,
 				})
 

@@ -145,7 +145,7 @@ class MailManagerTest extends TestCase {
 			->with($this->equalTo($client), $this->equalTo('INBOX'))
 			->willReturn($stats);
 
-		$actual = $this->manager->getFolderStats($account, 'INBOX');
+		$actual = $this->manager->getMailboxStats($account, 'INBOX');
 
 		$this->assertEquals($stats, $actual);
 	}

@@ -27,7 +27,7 @@ use Horde_Imap_Client;
 use OC;
 use OCA\Mail\Account;
 use OCA\Mail\Contracts\IMailManager;
-use OCA\Mail\Controller\FoldersController;
+use OCA\Mail\Controller\MailboxesController;
 use OCA\Mail\Service\AccountService;
 use OCA\Mail\Service\Sync\SyncService;
 use OCA\Mail\Tests\Integration\Framework\ImapTest;
@@ -37,13 +37,13 @@ class MailboxSynchronizationTest extends TestCase {
 	use ImapTest,
 		ImapTestAccount;
 
-	/** @var FoldersController */
+	/** @var MailboxesController */
 	private $foldersController;
 
 	protected function setUp(): void {
 		parent::setUp();
 
-		$this->foldersController = new FoldersController(
+		$this->foldersController = new MailboxesController(
 			'mail',
 			OC::$server->getRequest(),
 			OC::$server->query(AccountService::class),

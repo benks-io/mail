@@ -123,13 +123,13 @@ class AccountsController extends Controller {
 	 * @NoAdminRequired
 	 * @TrapError
 	 *
-	 * @param int $accountId
+	 * @param int $id
 	 *
 	 * @return JSONResponse
 	 * @throws ClientException
 	 */
-	public function show($accountId): JSONResponse {
-		return new JSONResponse($this->accountService->find($this->currentUserId, $accountId));
+	public function show(int $id): JSONResponse {
+		return new JSONResponse($this->accountService->find($this->currentUserId, $id));
 	}
 
 	/**
@@ -198,7 +198,7 @@ class AccountsController extends Controller {
 	 * @NoAdminRequired
 	 * @TrapError
 	 *
-	 * @param int $accountId
+	 * @param int $id
 	 * @param string|null $editorMode
 	 * @param int|null $order
 	 * @param bool|null $showSubscribedOnly
@@ -207,11 +207,11 @@ class AccountsController extends Controller {
 	 *
 	 * @throws ClientException
 	 */
-	public function patchAccount(int $accountId,
+	public function patchAccount(int $id,
 								 string $editorMode = null,
 								 int $order = null,
 								 bool $showSubscribedOnly = null): JSONResponse {
-		$account = $this->accountService->find($this->currentUserId, $accountId);
+		$account = $this->accountService->find($this->currentUserId, $id);
 
 		if ($account === null) {
 			return new JSONResponse(null, Http::STATUS_FORBIDDEN);
@@ -236,7 +236,7 @@ class AccountsController extends Controller {
 	 * @NoAdminRequired
 	 * @TrapError
 	 *
-	 * @param int $accountId
+	 * @param int $id
 	 * @param string|null $signature
 	 *
 	 * @return JSONResponse
@@ -244,8 +244,8 @@ class AccountsController extends Controller {
 	 * @throws ClientException
 	 * @throws ServiceException
 	 */
-	public function updateSignature(int $accountId, string $signature = null): JSONResponse {
-		$this->accountService->updateSignature($accountId, $this->currentUserId, $signature);
+	public function updateSignature(int $id, string $signature = null): JSONResponse {
+		$this->accountService->updateSignature($id, $this->currentUserId, $signature);
 		return new JSONResponse();
 	}
 
@@ -259,7 +259,7 @@ class AccountsController extends Controller {
 	 *
 	 * @throws ClientException
 	 */
-	public function destroy($id): JSONResponse {
+	public function destroy(int $id): JSONResponse {
 		$this->accountService->delete($this->currentUserId, $id);
 		return new JSONResponse();
 	}
@@ -315,7 +315,7 @@ class AccountsController extends Controller {
 	 * @NoAdminRequired
 	 * @TrapError
 	 *
-	 * @param int $accountId
+	 * @param int $id
 	 * @param string $subject
 	 * @param string $body
 	 * @param string $to
@@ -332,7 +332,7 @@ class AccountsController extends Controller {
 	 * @throws ClientException
 	 * @throws ServiceException
 	 */
-	public function send(int $accountId,
+	public function send(int $id,
 						 string $subject,
 						 string $body,
 						 string $to,
@@ -344,7 +344,7 @@ class AccountsController extends Controller {
 						 int $messageId = null,
 						 array $attachments = [],
 						 int $aliasId = null): JSONResponse {
-		$account = $this->accountService->find($this->currentUserId, $accountId);
+		$account = $this->accountService->find($this->currentUserId, $id);
 		$alias = $aliasId ? $this->aliasesService->find($aliasId, $this->currentUserId) : null;
 
 		$expandedTo = $this->groupsIntegration->expand($to);
@@ -370,7 +370,7 @@ class AccountsController extends Controller {
 	 * @NoAdminRequired
 	 * @TrapError
 	 *
-	 * @param int $accountId
+	 * @param int $id
 	 * @param string $subject
 	 * @param string $body
 	 * @param string $to
@@ -382,8 +382,8 @@ class AccountsController extends Controller {
 	 *
 	 * @throws ClientException
 	 */
-	public function draft(int $accountId,
-						  string $subject = null,
+	public function draft(int $id,
+						  string $subject,
 						  string $body,
 						  string $to,
 						  string $cc,
@@ -391,12 +391,12 @@ class AccountsController extends Controller {
 						  bool $isHtml = true,
 						  int $draftUID = null): JSONResponse {
 		if ($draftUID === null) {
-			$this->logger->info("Saving a new draft in account <$accountId>");
+			$this->logger->info("Saving a new draft in account <$id>");
 		} else {
-			$this->logger->info("Updating draft <$draftUID> in account <$accountId>");
+			$this->logger->info("Updating draft <$draftUID> in account <$id>");
 		}
 
-		$account = $this->accountService->find($this->currentUserId, $accountId);
+		$account = $this->accountService->find($this->currentUserId, $id);
 		$messageData = NewMessageData::fromRequest($account, $to, $cc, $bcc, $subject, $body, [], $isHtml);
 
 		try {
@@ -413,13 +413,13 @@ class AccountsController extends Controller {
 	/**
 	 * @NoAdminRequired
 	 *
-	 * @param int $accountId
+	 * @param int $id
 	 *
 	 * @return JSONResponse
 	 * @throws ClientException
 	 */
-	public function getQuota(int $accountId): JSONResponse {
-		$account = $this->accountService->find($this->currentUserId, $accountId);
+	public function getQuota(int $id): JSONResponse {
+		$account = $this->accountService->find($this->currentUserId, $id);
 
 		$quota = $this->mailManager->getQuota($account);
 		if ($quota === null) {

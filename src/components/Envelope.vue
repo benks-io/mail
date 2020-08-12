@@ -132,10 +132,9 @@ export default {
 				return {
 					name: 'message',
 					params: {
-						accountId: this.$route.params.accountId,
-						folderId: this.$route.params.folderId,
+						mailboxId: this.$route.params.mailboxId,
 						filter: this.$route.params.filter ? this.$route.params.filter : undefined,
-						messageUuid: 'new',
+						threadId: 'new',
 						draftUid: this.data.uid,
 					},
 					exact: true,
@@ -144,10 +143,9 @@ export default {
 				return {
 					name: 'message',
 					params: {
-						accountId: this.$route.params.accountId,
-						folderId: this.$route.params.folderId,
+						mailboxId: this.$route.params.mailboxId,
 						filter: this.$route.params.filter ? this.$route.params.filter : undefined,
-						messageUuid: this.data.uuid,
+						threadId: this.data.databaseId,
 					},
 					exact: true,
 				}

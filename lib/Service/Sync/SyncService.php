@@ -74,28 +74,24 @@ class SyncService {
 
 	/**
 	 * @param Account $account
-	 * @param string $mailboxId
+	 * @param Mailbox $mailbox
 	 *
 	 * @throws MailboxLockedException
 	 * @throws ServiceException
 	 */
 	public function clearCache(Account $account,
-							   string $mailboxId): void {
-		try {
-			$mailbox = $this->mailboxMapper->find($account, $mailboxId);
-		} catch (DoesNotExistException $e) {
-			throw new ServiceException('Mailbox to sync does not exist in the database', 0, $e);
-		}
-
+							   Mailbox $mailbox): void {
 		$this->synchronizer->clearCache($account, $mailbox);
 	}
 
 	/**
 	 * @param Account $account
-	 * @param string $mailboxId
+	 * @param Mailbox $mailbox
 	 * @param int $criteria
 	 * @param array $knownUids
 	 * @param bool $partialOnly
+	 *
+	 * @param string|null $filter
 	 *
 	 * @return Response
 	 * @throws ClientException
@@ -103,17 +99,11 @@ class SyncService {
 	 * @throws ServiceException
 	 */
 	public function syncMailbox(Account $account,
-								string $mailboxId,
+								Mailbox $mailbox,
 								int $criteria,
 								array $knownUids,
 								bool $partialOnly,
 								string $filter = null): Response {
-		try {
-			$mailbox = $this->mailboxMapper->find($account, $mailboxId);
-		} catch (DoesNotExistException $e) {
-			throw new ServiceException('Mailbox to sync does not exist in the database', 0, $e);
-		}
-
 		if ($partialOnly && !$mailbox->isCached()) {
 			throw MailboxNotCachedException::from($mailbox);
 		}

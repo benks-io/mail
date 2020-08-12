@@ -13,11 +13,9 @@ const amendEnvelopeWithIds = curry((accountId, folderId, envelope) => ({
 	...envelope,
 }))
 
-export function fetchEnvelope(accountId, folderId, uid) {
-	const url = generateUrl('/apps/mail/api/accounts/{accountId}/folders/{folderId}/messages/{uid}', {
-		accountId,
-		folderId,
-		uid,
+export function fetchEnvelope(id) {
+	const url = generateUrl('/apps/mail/api/messages/{id}', {
+		id,
 	})
 
 	return axios
@@ -31,12 +29,11 @@ export function fetchEnvelope(accountId, folderId, uid) {
 		})
 }
 
-export function fetchEnvelopes(accountId, folderId, query, cursor, limit) {
-	const url = generateUrl('/apps/mail/api/accounts/{accountId}/folders/{folderId}/messages', {
-		accountId,
-		folderId,
-	})
-	const params = {}
+export function fetchEnvelopes(mailboxId, query, cursor, limit) {
+	const url = generateUrl('/apps/mail/api/messages')
+	const params = {
+		mailboxId,
+	}
 
 	if (query) {
 		params.filter = query
@@ -59,8 +56,8 @@ export function fetchEnvelopes(accountId, folderId, query, cursor, limit) {
 		})
 }
 
-export async function syncEnvelopes(accountId, folderId, uids, query, init = false) {
-	const url = generateUrl('/apps/mail/api/accounts/{accountId}/folders/{folderId}/sync', {
+export async function syncEnvelopes(mailboxId, uids, query, init = false) {
+	const url = generateUrl('/apps/mail/api/accounts/{accountId}/folders/{mailboxId}/sync', {
 		accountId,
 		folderId,
 	})

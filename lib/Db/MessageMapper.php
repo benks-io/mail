@@ -31,6 +31,7 @@ use OCA\Mail\Address;
 use OCA\Mail\AddressList;
 use OCA\Mail\IMAP\Threading\DatabaseMessage;
 use OCA\Mail\Service\Search\SearchQuery;
+use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\QBMapper;
 use OCP\AppFramework\Utility\ITimeFactory;
 use OCP\DB\QueryBuilder\IQueryBuilder;
@@ -76,6 +77,25 @@ class MessageMapper extends QBMapper {
 			return null;
 		}
 		return $max;
+	}
+
+	public function findByUserId(string $uid, int $id): Message {
+		$query = $this->db->getQueryBuilder();
+
+		$query->select('m.uid')
+			->from($this->getTableName(), 'm')
+			->join('m', 'mail_mailboxes', 'mb', $query->expr()->eq('m.mailbox_id', 'mb.id', IQueryBuilder::PARAM_INT))
+			->join('m', 'mail_accounts', 'a', $query->expr()->eq('mb.account_id', 'a.id', IQueryBuilder::PARAM_INT))
+			->where(
+				$query->expr()->eq('a.user_id', $query->createNamedParameter($uid)),
+				$query->expr()->eq('m.id', $query->createNamedParameter($id, IQueryBuilder::PARAM_INT), IQueryBuilder::PARAM_INT)
+			);
+
+		$results = $this->findRecipients($this->findEntities($query));
+		if (empty($results)) {
+			throw new DoesNotExistException("Message $id does not exist");
+		}
+		return $results[0];
 	}
 
 	public function findAllUids(Mailbox $mailbox): array {

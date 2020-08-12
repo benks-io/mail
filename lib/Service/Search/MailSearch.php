@@ -75,32 +75,26 @@ class MailSearch implements IMailSearch {
 		$this->logger = $logger;
 	}
 
-	public function findMessage(Account $account, string $mailboxName, int $uid): Message {
-		try {
-			$mailbox = $this->mailboxMapper->find($account, $mailboxName);
-		} catch (DoesNotExistException $e) {
-			throw new ServiceException('Mailbox does not exist', 0, $e);
-		}
-
-		$messages = $this->previewEnhancer->process(
+	public function findMessage(Account $account,
+								Mailbox $mailbox,
+								Message $message): Message {
+		$processed = $this->previewEnhancer->process(
 			$account,
 			$mailbox,
-			$this->messageMapper->findByUids(
-				$mailbox,
-				[$uid]
-			)
+			[$message]
 		);
-		if (empty($messages)) {
+		if (empty($processed)) {
 			throw new DoesNotExistException("Message does not exist");
 		}
-		return $messages[0];
+		return $processed[0];
 	}
 
 	/**
 	 * @param Account $account
-	 * @param string $mailboxName
+	 * @param Mailbox $mailbox
 	 * @param string|null $filter
 	 * @param int|null $cursor
+	 * @param int|null $limit
 	 *
 	 * @return Message[]
 	 *
@@ -108,16 +102,10 @@ class MailSearch implements IMailSearch {
 	 * @throws ServiceException
 	 */
 	public function findMessages(Account $account,
-								 string $mailboxName,
+								 Mailbox $mailbox,
 								 ?string $filter,
 								 ?int $cursor,
 								 ?int $limit): array {
-		try {
-			$mailbox = $this->mailboxMapper->find($account, $mailboxName);
-		} catch (DoesNotExistException $e) {
-			throw new ServiceException('Mailbox does not exist', 0, $e);
-		}
-
 		if ($mailbox->hasLocks()) {
 			throw MailboxLockedException::from($mailbox);
 		}

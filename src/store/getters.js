@@ -34,6 +34,12 @@ export const getters = {
 	accounts: (state) => {
 		return state.accountList.map((id) => state.accounts[id])
 	},
+	getMailbox: (state) => (mailboxId) => {
+		// TODO: fix normalization
+		return Object.keys(state.folders)
+			.map(fid => state.folders[fid])
+			.filter(f => f.databaseId === mailboxId)[0]
+	},
 	getFolder: (state) => (accountId, folderId) => {
 		return state.folders[normalizedFolderId(accountId, folderId)]
 	},
@@ -52,11 +58,14 @@ export const getters = {
 				.filter((folder) => folder.specialRole === specialRole)
 		)
 	},
-	getEnvelope: (state) => (accountId, folderId, uid) => {
-		return state.envelopes[normalizedMessageId(accountId, folderId, uid)]
+	getEnvelope: (state) => (id) => {
+		// TODO: fix normalization
+		return Object.keys(state.envelopes)
+			.map(uuid => state.envelopes[uuid])
+			.filter(e => e.databaseId === id)[0]
 	},
-	getEnvelopeById: (state) => (id) => {
-		return state.envelopes[id]
+	getEnvelopeByUuid: (state) => (uuid) => {
+		return state.envelopes[uuid]
 	},
 	getEnvelopes: (state, getters) => (accountId, folderId, query) => {
 		const list = getters.getFolder(accountId, folderId).envelopeLists[normalizedEnvelopeListId(query)] || []

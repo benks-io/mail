@@ -424,13 +424,13 @@ class IMAPMessage implements IMessage, JsonSerializable {
 	/**
 	 * @return array
 	 */
-	public function getFullMessage(int $accountId, string $mailbox, int $id): array {
+	public function getFullMessage(int $accountId, string $mailbox, int $uid): array {
 		$mailBody = $this->plainMessage;
 
 		$data = $this->jsonSerialize();
 		if ($this->hasHtmlMessage) {
 			$data['hasHtmlBody'] = true;
-			$data['body'] = $this->getHtmlBody($accountId, $mailbox, $id);
+			$data['body'] = $this->getHtmlBody($accountId, $mailbox, $uid);
 		} else {
 			$mailBody = $this->htmlService->convertLinks($mailBody);
 			list($mailBody, $signature) = $this->htmlService->parseMailBody($mailBody);
@@ -464,15 +464,15 @@ class IMAPMessage implements IMessage, JsonSerializable {
 	/**
 	 * @param int $accountId
 	 * @param string $folderId
-	 * @param int $messageId
+	 * @param int $uid
 	 *
 	 * @return string
 	 */
-	public function getHtmlBody(int $accountId, string $folderId, int $messageId): string {
+	public function getHtmlBody(int $accountId, string $folderId, int $uid): string {
 		return $this->htmlService->sanitizeHtmlMailBody($this->htmlMessage, [
 			'accountId' => $accountId,
 			'folderId' => base64_encode($folderId),
-			'messageId' => $messageId,
+			'messageId' => $uid,
 		], function ($cid) {
 			$match = array_filter($this->attachments,
 				function ($a) use ($cid) {

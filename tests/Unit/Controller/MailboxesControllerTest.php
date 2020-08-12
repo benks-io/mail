@@ -28,7 +28,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use function base64_encode;
 use OCA\Mail\Account;
 use OCA\Mail\Contracts\IMailManager;
-use OCA\Mail\Controller\FoldersController;
+use OCA\Mail\Controller\MailboxesController;
 use OCA\Mail\Exception\NotImplemented;
 use OCA\Mail\Folder;
 use OCA\Mail\IMAP\FolderStats;
@@ -37,7 +37,7 @@ use ChristophWurst\Nextcloud\Testing\TestCase;
 use OCP\AppFramework\Http\JSONResponse;
 use OCP\IRequest;
 
-class FoldersControllerTest extends TestCase {
+class MailboxesControllerTest extends TestCase {
 
 	/** @var string */
 	private $appName = 'mail';
@@ -54,7 +54,7 @@ class FoldersControllerTest extends TestCase {
 	/** @var IMailManager|MockObject */
 	private $mailManager;
 
-	/** @var FoldersController */
+	/** @var MailboxesController */
 	private $controller;
 
 	/** @var SyncService|MockObject */
@@ -67,7 +67,7 @@ class FoldersControllerTest extends TestCase {
 		$this->accountService = $this->createMock(AccountService::class);
 		$this->mailManager = $this->createMock(IMailManager::class);
 		$this->syncService = $this->createMock(SyncService::class);
-		$this->controller = new FoldersController(
+		$this->controller = new MailboxesController(
 			$this->appName,
 			$this->request,
 			$this->accountService,

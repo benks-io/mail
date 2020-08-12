@@ -143,7 +143,7 @@ export default {
 			const saveAttachment = (accountId, folderId, messageId, attachmentId) => (directory) => {
 				return saveAttachmentToFiles(accountId, folderId, messageId, attachmentId, directory)
 			}
-			const { accountId, folderId, uid } = parseUuid(this.$route.params.messageUuid)
+			const { accountId, folderId, uid } = parseUuid(this.$route.params.threadId)
 			const picker = getFilePickerBuilder(t('mail', 'Choose a folder to store the attachment in'))
 				.setMultiSelect(false)
 				.addMimeTypeFilter('httpd/unix-directory')
