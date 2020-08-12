@@ -56,10 +56,9 @@ export function fetchEnvelopes(mailboxId, query, cursor, limit) {
 		})
 }
 
-export async function syncEnvelopes(mailboxId, uids, query, init = false) {
-	const url = generateUrl('/apps/mail/api/accounts/{accountId}/folders/{mailboxId}/sync', {
-		accountId,
-		folderId,
+export async function syncEnvelopes(id, uids, query, init = false) {
+	const url = generateUrl('/apps/mail/api/mailboxes/{id}/sync', {
+		id,
 	})
 
 	try {
@@ -84,10 +83,9 @@ export async function syncEnvelopes(mailboxId, uids, query, init = false) {
 	}
 }
 
-export async function clearCache(accountId, folderId) {
-	const url = generateUrl('/apps/mail/api/accounts/{accountId}/folders/{folderId}/sync', {
-		accountId,
-		folderId,
+export async function clearCache(accountId, id) {
+	const url = generateUrl('/apps/mail/api/mailboxes/{id}/sync', {
+		id,
 	})
 
 	try {
@@ -101,26 +99,21 @@ export async function clearCache(accountId, folderId) {
 	}
 }
 
-export function setEnvelopeFlag(accountId, folderId, uid, flag, value) {
-	const url = generateUrl('/apps/mail/api/accounts/{accountId}/folders/{folderId}/messages/{uid}/flags', {
-		accountId,
-		folderId,
-		uid,
+export function setEnvelopeFlag(id, uid, flag, value) {
+	const url = generateUrl('/apps/mail/api/messages/{id}/flags', {
+		id,
 	})
-
-	const flags = {}
-	flags[flag] = value
 
 	return axios
 		.put(url, {
-			flags,
+			flags: {
+				[flag]: value
+			},
 		})
 }
 
-export function fetchMessage(accountId, folderId, id) {
-	const url = generateUrl('/apps/mail/api/accounts/{accountId}/folders/{folderId}/messages/{id}/body', {
-		accountId,
-		folderId,
+export function fetchMessage(id) {
+	const url = generateUrl('/apps/mail/api/messages/{id}/body', {
 		id,
 	})
 
@@ -151,10 +144,8 @@ export function sendMessage(accountId, data) {
 	return axios.post(url, data).then((resp) => resp.data)
 }
 
-export function deleteMessage(accountId, folderId, id) {
-	const url = generateUrl('/apps/mail/api/accounts/{accountId}/folders/{folderId}/messages/{id}', {
-		accountId,
-		folderId,
+export function deleteMessage(id) {
+	const url = generateUrl('/apps/mail/api/messages/{id}', {
 		id,
 	})
 

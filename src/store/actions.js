@@ -51,11 +51,11 @@ import {
 	updateSignature,
 } from '../service/AccountService'
 import {
-	create as createFolder,
-	fetchAll as fetchAllFolders,
-	markFolderRead,
-	deleteFolder,
-} from '../service/FolderService'
+	create as createMailbox,
+	fetchAll as fetchAllMailboxes,
+	markMailboxRead,
+	deleteMailbox,
+} from '../service/MailboxService'
 import {
 	deleteMessage,
 	fetchEnvelope,
@@ -115,7 +115,7 @@ export default {
 	createAccount({ commit }, config) {
 		return createAccount(config).then((account) => {
 			logger.debug(`account ${account.id} created, fetching folders …`, account)
-			return fetchAllFolders(account.id)
+			return fetchAllMailboxes(account.id)
 				.then((folders) => {
 					account.folders = folders
 					commit('addAccount', account)
@@ -153,11 +153,11 @@ export default {
 		})
 	},
 	async deleteFolder({ commit }, { account, folder }) {
-		await deleteFolder(account.id, folder.id)
+		await deleteMailbox(account.id, folder.id)
 		commit('removeFolder', { accountId: account.id, folderId: folder.id })
 	},
 	createFolder({ commit }, { account, name }) {
-		return createFolder(account.id, name).then((folder) => {
+		return createMailbox(account.id, name).then((folder) => {
 			console.debug(`folder ${name} created for account ${account.id}`, { folder })
 			commit('addFolder', { account, folder })
 			commit('expandAccount', account.id)
@@ -201,7 +201,8 @@ export default {
 			)
 		}
 
-		return markFolderRead(accountId, folderId).then(
+		// TODO: use DB ID
+		return markMailboxRead(folderId).then(
 			dispatch('syncEnvelopes', {
 				accountId,
 				folderId,
@@ -661,6 +662,7 @@ export default {
 	},
 	fetchMessage({ commit }, uuid) {
 		const { accountId, folderId, uid } = parseUuid(uuid)
+		// TODO: use DB ID
 		return fetchMessage(accountId, folderId, uid).then((message) => {
 			// Only commit if not undefined (not found)
 			if (message) {
@@ -684,6 +686,7 @@ export default {
 	deleteMessage({ getters, commit }, { accountId, folderId, uid }) {
 		commit('removeEnvelope', { accountId, folderId, uid })
 
+		// TODO: use DB ID
 		return deleteMessage(accountId, folderId, uid)
 			.then(() => {
 				const folder = getters.getFolder(accountId, folderId)

@@ -97,7 +97,7 @@ import ActionInput from '@nextcloud/vue/dist/Components/ActionInput'
 import ActionText from '@nextcloud/vue/dist/Components/ActionText'
 
 import { clearCache } from '../service/MessageService'
-import { getFolderStats } from '../service/FolderService'
+import { getMailboxStatus } from '../service/MailboxService'
 import logger from '../logger'
 import { translatePlural as n } from '@nextcloud/l10n'
 import { translate as translateMailboxName } from '../i18n/MailboxTranslator'
@@ -234,7 +234,7 @@ export default {
 			}
 
 			try {
-				const stats = await getFolderStats(this.account.id, this.folder.id)
+				const stats = await getMailboxStatus(this.account.id, this.folder.id)
 				logger.debug('loaded folder stats', { stats })
 				this.folderStats = stats
 			} catch (error) {

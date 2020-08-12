@@ -24,7 +24,7 @@ import { generateUrl } from '@nextcloud/router'
 
 export function saveAttachmentToFiles(accountId, folderId, messageId, attachmentId, directory) {
 	const url = generateUrl(
-		'apps/mail/api/accounts/{accountId}/folders/{folderId}/messages/{messageId}/attachment/{attachmentId}',
+		'/apps/mail/api/messages/{id}/attachment/{attachmentId}',
 		{
 			accountId,
 			folderId,

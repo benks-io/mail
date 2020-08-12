@@ -93,7 +93,7 @@ class MailboxesController extends Controller {
 		return new JSONResponse([
 			'id' => $accountId,
 			'email' => $account->getEmail(),
-			'folders' => $mailboxes,
+			'mailboxes' => $mailboxes,
 			'delimiter' => reset($mailboxes)->getDelimiter(),
 		]);
 	}
