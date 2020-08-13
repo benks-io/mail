@@ -117,13 +117,13 @@ class PageController extends Controller {
 				$this->currentUserId);
 			try {
 				$mailboxes = $this->mailManager->getMailboxes($mailAccount);
-				$json['folders'] = $mailboxes;
+				$json['mailboxes'] = $mailboxes;
 			} catch (Exception $ex) {
 				$this->logger->logException($ex, [
-					'message' => 'Could not load account folders: ' . $ex->getMessage(),
+					'message' => 'Could not load account mailboxes: ' . $ex->getMessage(),
 					'level' => ILogger::FATAL,
 				]);
-				$json['folders'] = [];
+				$json['mailboxes'] = [];
 				$json['error'] = true;
 			}
 			$accountsJson[] = $json;

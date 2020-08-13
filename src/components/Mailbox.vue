@@ -115,7 +115,7 @@ export default {
 	},
 	computed: {
 		envelopes() {
-			return this.$store.getters.getEnvelopes(this.account.id, this.folder.id, this.searchQuery)
+			return this.$store.getters.getEnvelopes(this.folder.databaseId, this.searchQuery)
 		},
 		envelopesToShow() {
 			if (this.paginate === 'manual' && !this.expanded) {
@@ -182,8 +182,7 @@ export default {
 
 			try {
 				const envelopes = await this.$store.dispatch('fetchEnvelopes', {
-					accountId: this.account.id,
-					folderId: this.folder.id,
+					mailboxId: this.folder.databaseId,
 					query: this.searchQuery,
 					limit: this.initialPageSize,
 				})
@@ -316,9 +315,7 @@ export default {
 				this.onDelete(env.databaseId)
 				this.$store
 					.dispatch('deleteMessage', {
-						accountId: env.accountId,
-						folderId: env.folderId,
-						uid: env.uid,
+						id: env.databaseId,
 					})
 					.catch((error) =>
 						logger.error('could not delete envelope', {
@@ -381,7 +378,7 @@ export default {
 			}
 		},
 		onDelete(id) {
-			const idx = findIndex(propEq('uuid', id), this.envelopes)
+			const idx = findIndex(propEq('databaseId', id), this.envelopes)
 			if (idx === -1) {
 				logger.debug('envelope to delete does not exist in envelope list')
 				return

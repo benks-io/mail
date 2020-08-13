@@ -252,6 +252,7 @@ class Message extends Entity implements JsonSerializable {
 			'to' => $this->getTo()->jsonSerialize(),
 			'cc' => $this->getCc()->jsonSerialize(),
 			'bcc' => $this->getBcc()->jsonSerialize(),
+			'mailboxId' => $this->getMailboxId(),
 		];
 	}
 }

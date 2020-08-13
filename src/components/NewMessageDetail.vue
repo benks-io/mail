@@ -64,7 +64,7 @@ export default {
 					subject: this.draft.subject,
 					body: this.draft.hasHtmlBody ? html(this.draft.body) : plain(this.draft.body),
 				}
-			} else if (this.$route.query.uuid !== undefined) {
+			} else if (this.$route.query.messageId !== undefined) {
 				// Forward or reply to a message
 				const message = this.original
 				logger.debug('forwarding or replying to message', { message })
@@ -161,8 +161,8 @@ export default {
 		fetchMessage() {
 			if (this.$route.params.draftUid !== undefined) {
 				return this.fetchDraftMessage(this.$route.params.draftUid)
-			} else if (this.$route.query.uuid !== undefined) {
-				return this.fetchOriginalMessage(this.$route.query.uuid)
+			} else if (this.$route.query.messageId !== undefined) {
+				return this.fetchOriginalMessage(this.$route.query.messageId)
 			}
 		},
 		fetchDraftMessage(draftUid) {
@@ -206,7 +206,7 @@ export default {
 
 			try {
 				const message = await this.$store.dispatch('fetchMessage', uid)
-				if (message.uuid !== this.$route.query.uuid) {
+				if (message.databaseId !== this.$route.query.messageId) {
 					logger.debug("User navigated away, loaded original message won't be used")
 					return
 				}

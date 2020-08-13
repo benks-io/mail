@@ -100,7 +100,7 @@ export default {
 	computed: {
 		menu() {
 			return this.$store.getters.accounts.map((account) => {
-				const folders = this.$store.getters.getFolders(account.id)
+				const folders = this.$store.getters.getMailboxes(account.id)
 				const nonSpecialRoleFolders = folders.filter(
 					(folder) => SHOW_COLLAPSED.indexOf(folder.specialRole) === -1
 				)
@@ -119,7 +119,7 @@ export default {
 		onNewMessage() {
 			const accountId = this.$route.params.accountId || this.$store.getters.accounts[0].id
 
-			const mailboxId = this.$route.params.mailboxId || this.$store.getters.getFolders(accountId)[0]?.databaseId
+			const mailboxId = this.$route.params.mailboxId || this.$store.getters.getMailboxes(accountId)[0]?.databaseId
 			if (
 				this.$router.currentRoute.name === 'message'
 				&& this.$router.currentRoute.params.getMailboxes === 'new'

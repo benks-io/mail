@@ -132,7 +132,7 @@ export default {
 			return this.$store.getters.getAccount(UNIFIED_ACCOUNT_ID)
 		},
 		unifiedInbox() {
-			return this.$store.getters.getFolder(UNIFIED_ACCOUNT_ID, UNIFIED_INBOX_ID)
+			return this.$store.getters.getMailbox(UNIFIED_INBOX_ID)
 		},
 		hasMessages() {
 			// it actually should be `return this.$store.getters.getEnvelopes(this.account.id, this.folder.id).length > 0`

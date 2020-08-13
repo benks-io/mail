@@ -201,9 +201,7 @@ export default {
 		onDelete() {
 			this.$emit('delete')
 			this.$store.dispatch('deleteMessage', {
-				accountId: this.data.accountId,
-				folderId: this.data.folderId,
-				uid: this.data.uid,
+				id: this.data.databaseId,
 			})
 		},
 	},

@@ -256,7 +256,7 @@ export default {
 					filter: this.$route.params.filter ? this.$route.params.filter : undefined,
 				},
 				query: {
-					uuid: this.message.uuid,
+					messageId: this.message.databaseId,
 				},
 			})
 		},
@@ -269,7 +269,7 @@ export default {
 					filter: this.$route.params.filter ? this.$route.params.filter : undefined,
 				},
 				query: {
-					uuid: this.message.uuid,
+					messageId: this.message.databaseId,
 				},
 			})
 		},
@@ -282,7 +282,7 @@ export default {
 					filter: this.$route.params.filter ? this.$route.params.filter : undefined,
 				},
 				query: {
-					uuid: this.message.uuid,
+					messageId: this.message.databaseId,
 				},
 			})
 		},
@@ -295,9 +295,7 @@ export default {
 		onDelete() {
 			this.$emit('delete', this.envelope.databaseId)
 			this.$store.dispatch('deleteMessage', {
-				accountId: this.message.accountId,
-				folderId: this.message.folderId,
-				uid: this.message.uid,
+				id: this.message.databaseId,
 			})
 		},
 		async onShowSource() {

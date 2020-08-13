@@ -56,7 +56,7 @@ export default {
 			// Show first account
 			const firstAccount = accounts[0]
 			// FIXME: this assumes that there's at least one folder
-			const firstFolder = this.$store.getters.getFolders(firstAccount.id)[0]
+			const firstFolder = this.$store.getters.getMailboxes(firstAccount.id)[0]
 
 			console.debug('loading first folder of first account', firstAccount.id, firstFolder.databaseId)
 
@@ -80,7 +80,7 @@ export default {
 			// Show first account
 			const firstAccount = accounts[0]
 			// FIXME: this assumes that there's at least one folder
-			const firstFolder = this.$store.getters.getFolders(firstAccount.id)[0]
+			const firstFolder = this.$store.getters.getMailboxes(firstAccount.id)[0]
 
 			console.debug('loading composer with first account and folder', firstAccount.id, firstFolder.id)
 

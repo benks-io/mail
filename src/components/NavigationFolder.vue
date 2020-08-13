@@ -54,10 +54,10 @@
 				<ActionButton
 					v-if="!editing && top && !account.isUnified && folder.specialRole !== 'flagged'"
 					icon="icon-folder"
-					@click="openCreateFolder">
+					@click="openCreateMailbox">
 					{{ t('mail', 'Add subfolder') }}
 				</ActionButton>
-				<ActionInput v-if="editing" icon="icon-folder" @submit.prevent.stop="createFolder" />
+				<ActionInput v-if="editing" icon="icon-folder" @submit.prevent.stop="createMailbox" />
 				<ActionText v-if="showSaving" icon="icon-loading-small">
 					{{ t('mail', 'Saving') }}
 				</ActionText>
@@ -180,7 +180,7 @@ export default {
 			}
 		},
 		subFolders() {
-			return this.$store.getters.getSubfolders(this.account.id, this.folder.id)
+			return this.$store.getters.getSubMailboxes(this.folder.databaseId)
 		},
 		statsText() {
 			if (this.folderStats && 'total' in this.folderStats && 'unread' in this.folderStats) {
@@ -243,14 +243,14 @@ export default {
 			}
 		},
 
-		async createFolder(e) {
+		async createMailbox(e) {
 			this.editing = true
 			const name = e.target.elements[1].value
 			const withPrefix = atob(this.folder.id) + this.folder.delimiter + name
 			logger.info(`creating folder ${withPrefix} as subfolder of ${this.folder.id}`)
 			this.menuOpen = false
 			try {
-				await this.$store.dispatch('createFolder', {
+				await this.$store.dispatch('createMailbox', {
 					account: this.account,
 					name: withPrefix,
 				})
@@ -264,7 +264,7 @@ export default {
 			logger.info(`folder ${withPrefix} created`)
 			this.showSubFolders = true
 		},
-		openCreateFolder() {
+		openCreateMailbox() {
 			this.editing = true
 			this.showSaving = false
 		},
@@ -272,9 +272,9 @@ export default {
 			this.loadingMarkAsRead = true
 
 			this.$store
-				.dispatch('markFolderRead', {
+				.dispatch('markMailboxRead', {
 					accountId: this.account.id,
-					folderId: this.folder.id,
+					mailboxId: this.folder.databaseId,
 				})
 				.then(() => logger.info(`folder ${this.folder.id} marked as read`))
 				.catch((error) => logger.error(`could not mark folder ${this.folder.id} as read`, { error }))
@@ -313,11 +313,11 @@ export default {
 				(result) => {
 					if (result) {
 						return this.$store
-							.dispatch('deleteFolder', { account: this.account, folder: this.folder })
+							.dispatch('deleteMailbox', { mailbox: this.folder })
 							.then(() => {
-								logger.info(`folder ${id} deleted`)
+								logger.info(`mailbox ${id} deleted`)
 							})
-							.catch((error) => logger.error('could not delete folder', { error }))
+							.catch((error) => logger.error('could not delete mailbox', { error }))
 					}
 				}
 			)

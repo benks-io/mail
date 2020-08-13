@@ -33,7 +33,7 @@
 				:class="{refreshing: refreshing}" />
 			<Envelope
 				v-for="env in envelopes"
-				:key="env.uuid"
+				:key="env.databaseId"
 				:data="env"
 				:folder="folder"
 				:selected="isEnvelopeSelected(envelopes.indexOf(env))"
@@ -166,7 +166,9 @@ export default {
 						})
 					}
 				}
-				this.$store.dispatch('deleteMessage', this.envelopes[envelopeId])
+				this.$store.dispatch('deleteMessage', {
+					id: this.envelopes[envelopeId],
+				})
 			})
 			this.unselectAll()
 		},

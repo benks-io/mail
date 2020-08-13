@@ -26,14 +26,12 @@ import orderBy from 'lodash/fp/orderBy'
 import actions from '../../../store/actions'
 import * as MessageService from '../../../service/MessageService'
 import * as NotificationService from '../../../service/NotificationService'
-import { normalizedMessageId } from '../../../store/normalization'
 import { UNIFIED_ACCOUNT_ID, UNIFIED_INBOX_ID } from '../../../store/constants'
 
 const mockEnvelope = curry((accountId, folderId, uid) => ({
 	accountId,
 	folderId,
 	uid,
-	uuid: normalizedMessageId(accountId, folderId, uid),
 	dateInt: uid * 10000,
 }))
 
@@ -47,7 +45,7 @@ describe('Vuex store actions', () => {
 			getters: {
 				accounts: [],
 				getFolder: sinon.stub(),
-				getFolders: sinon.stub(),
+				getMailboxes: sinon.stub(),
 				getEnvelopeByUuid: sinon.stub(),
 				getEnvelopes: sinon.stub(),
 			},
@@ -65,7 +63,7 @@ describe('Vuex store actions', () => {
 
 		const envelopes = actions.fetchEnvelopes(context, {
 			accountId: UNIFIED_ACCOUNT_ID,
-			folderId: UNIFIED_INBOX_ID,
+			mailboxId: UNIFIED_INBOX_ID,
 		})
 
 		expect(envelopes).to.be.empty
@@ -80,7 +78,7 @@ describe('Vuex store actions', () => {
 			isUnified: true,
 			specialRole: 'inbox',
 		})
-		context.getters.getFolders.withArgs(13).returns([
+		context.getters.getMailboxes.withArgs(13).returns([
 			{
 				id: 'INBOX',
 				accountId: 13,
@@ -94,8 +92,7 @@ describe('Vuex store actions', () => {
 		])
 		context.dispatch
 			.withArgs('fetchEnvelopes', {
-				accountId: 13,
-				folderId: 'INBOX',
+				mailboxId: 'INBOX',
 				query: undefined,
 			})
 			.returns([
@@ -109,7 +106,7 @@ describe('Vuex store actions', () => {
 
 		const envelopes = await actions.fetchEnvelopes(context, {
 			accountId: UNIFIED_ACCOUNT_ID,
-			folderId: UNIFIED_INBOX_ID,
+			mailboxId: UNIFIED_INBOX_ID,
 		})
 
 		expect(envelopes).to.deep.equal([
@@ -122,8 +119,6 @@ describe('Vuex store actions', () => {
 		])
 		expect(context.dispatch).to.have.been.calledOnce
 		expect(context.commit).to.have.been.calledWith('addEnvelope', {
-			accountId: UNIFIED_ACCOUNT_ID,
-			folderId: UNIFIED_INBOX_ID,
 			envelope: {
 				accountId: 13,
 				folderId: 'INBOX',
@@ -144,18 +139,17 @@ describe('Vuex store actions', () => {
 			accountId: 13,
 			specialRole: 'inbox',
 			envelopeLists: {
-				'': reverse(range(21, 40).map(normalizedMessageId(13, 'INBOX'))),
+				'': reverse(range(21, 40)),
 			},
 		})
 		context.getters.getEnvelopeByUuid
-			.withArgs(normalizedMessageId(13, 'INBOX', 21))
+			.withArgs('13-INBOX-21')
 			.returns(mockEnvelope(13, 'INBOX', 1))
 		sinon.stub(MessageService, 'fetchEnvelopes').returns(
 			Promise.resolve(
 				reverse(
 					range(1, 21).map((n) => ({
 						uid: n,
-						uuid: normalizedMessageId(13, 'INBOX', n),
 						dateInt: n * 10000,
 					}))
 				)
@@ -171,7 +165,6 @@ describe('Vuex store actions', () => {
 			reverse(
 				range(1, 21).map((n) => ({
 					uid: n,
-					uuid: normalizedMessageId(13, 'INBOX', n),
 					dateInt: n * 10000,
 				}))
 			)
@@ -198,7 +191,7 @@ describe('Vuex store actions', () => {
 			accountId: UNIFIED_ACCOUNT_ID,
 			id: UNIFIED_INBOX_ID,
 		})
-		context.getters.getFolders.withArgs(13).returns([
+		context.getters.getMailboxes.withArgs(13).returns([
 			{
 				id: 'INBOX',
 				accountId: 13,
@@ -210,7 +203,7 @@ describe('Vuex store actions', () => {
 				specialRole: 'draft',
 			},
 		])
-		context.getters.getFolders.withArgs(26).returns([
+		context.getters.getMailboxes.withArgs(26).returns([
 			{
 				id: 'INBOX',
 				accountId: 26,
@@ -262,7 +255,7 @@ describe('Vuex store actions', () => {
 			accountId: UNIFIED_ACCOUNT_ID,
 			id: UNIFIED_INBOX_ID,
 		})
-		context.getters.getFolders.withArgs(13).returns([
+		context.getters.getMailboxes.withArgs(13).returns([
 			{
 				id: 'INBOX',
 				accountId: 13,
@@ -274,7 +267,7 @@ describe('Vuex store actions', () => {
 				specialRole: 'draft',
 			},
 		])
-		context.getters.getFolders.withArgs(26).returns([
+		context.getters.getMailboxes.withArgs(26).returns([
 			{
 				id: 'INBOX',
 				accountId: 26,
@@ -340,7 +333,7 @@ describe('Vuex store actions', () => {
 				accountId: UNIFIED_ACCOUNT_ID,
 				id: UNIFIED_INBOX_ID,
 			})
-			context.getters.getFolders.withArgs(13).returns([
+			context.getters.getMailboxes.withArgs(13).returns([
 				{
 					id: 'INBOX',
 					accountId: 13,
@@ -354,7 +347,7 @@ describe('Vuex store actions', () => {
 					envelopeLists: {},
 				},
 			])
-			context.getters.getFolders.withArgs(26).returns([
+			context.getters.getMailboxes.withArgs(26).returns([
 				{
 					id: 'INBOX',
 					accountId: 26,
@@ -373,16 +366,14 @@ describe('Vuex store actions', () => {
 
 			expect(context.dispatch).have.callCount(4) // 2 fetch + 2 sync
 			expect(context.dispatch).have.been.calledWith('fetchEnvelopes', {
-				accountId: 13,
-				folderId: 'INBOX',
+				mailboxId: 'INBOX',
 			})
 			expect(context.dispatch).have.been.calledWith('syncEnvelopes', {
 				accountId: 13,
 				folderId: 'INBOX',
 			})
 			expect(context.dispatch).have.been.calledWith('fetchEnvelopes', {
-				accountId: 26,
-				folderId: 'INBOX',
+				mailboxId: 'INBOX',
 			})
 			expect(context.dispatch).have.been.calledWith('syncEnvelopes', {
 				accountId: 26,
@@ -407,7 +398,7 @@ describe('Vuex store actions', () => {
 				accountId: UNIFIED_ACCOUNT_ID,
 				id: UNIFIED_INBOX_ID,
 			})
-			context.getters.getFolders.withArgs(13).returns([
+			context.getters.getMailboxes.withArgs(13).returns([
 				{
 					id: 'INBOX',
 					accountId: 13,
@@ -425,7 +416,7 @@ describe('Vuex store actions', () => {
 					},
 				},
 			])
-			context.getters.getFolders.withArgs(26).returns([
+			context.getters.getMailboxes.withArgs(26).returns([
 				{
 					id: 'INBOX',
 					accountId: 26,

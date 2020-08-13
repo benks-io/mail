@@ -6,10 +6,8 @@ import { parseErrorResponse } from '../http/ErrorResponseParser'
 import { convertAxiosError } from '../errors/convert'
 import SyncIncompleteError from '../errors/SyncIncompleteError'
 
-const amendEnvelopeWithIds = curry((accountId, folderId, envelope) => ({
+const amendEnvelopeWithIds = curry((accountId, envelope) => ({
 	accountId,
-	folderId,
-	uuid: `${accountId}-${folderId}-${envelope.uid}`,
 	...envelope,
 }))
 
@@ -20,7 +18,7 @@ export function fetchEnvelope(id) {
 
 	return axios
 		.get(url)
-		.then((resp) => amendEnvelopeWithIds(accountId, folderId, resp.data))
+		.then((resp) => amendEnvelopeWithIds(accountId, resp.data))
 		.catch((error) => {
 			if (error.response && error.response.status === 404) {
 				return undefined
@@ -50,7 +48,7 @@ export function fetchEnvelopes(mailboxId, query, cursor, limit) {
 			params,
 		})
 		.then((resp) => resp.data)
-		.then(map(amendEnvelopeWithIds(accountId, folderId)))
+		.then(map(amendEnvelopeWithIds(accountId)))
 		.catch((error) => {
 			throw convertAxiosError(error)
 		})
@@ -99,7 +97,7 @@ export async function clearCache(accountId, id) {
 	}
 }
 
-export function setEnvelopeFlag(id, uid, flag, value) {
+export function setEnvelopeFlag(id, flag, value) {
 	const url = generateUrl('/apps/mail/api/messages/{id}/flags', {
 		id,
 	})
