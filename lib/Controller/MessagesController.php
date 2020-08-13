@@ -39,7 +39,6 @@ use OCA\Mail\Http\AttachmentDownloadResponse;
 use OCA\Mail\Http\HtmlResponse;
 use OCA\Mail\Model\IMAPMessage;
 use OCA\Mail\Service\AccountService;
-use OCA\Mail\Service\IMailBox;
 use OCA\Mail\Service\ItineraryService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Db\DoesNotExistException;
@@ -55,7 +54,6 @@ use OCP\ILogger;
 use OCP\IRequest;
 use OCP\IURLGenerator;
 use function array_map;
-use function base64_decode;
 
 class MessagesController extends Controller {
 
@@ -481,7 +479,7 @@ class MessagesController extends Controller {
 			$attachment = $folder->getAttachment($id, $attachmentId);
 
 			$fileName = $attachment->getName() ?? $this->l10n->t('Embedded message %s', [
-					$aid,
+				$aid,
 			]) . '.eml';
 			$fileParts = pathinfo($fileName);
 			$fileName = $fileParts['filename'];

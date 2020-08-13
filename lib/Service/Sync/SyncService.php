@@ -38,7 +38,6 @@ use OCA\Mail\IMAP\PreviewEnhancer;
 use OCA\Mail\IMAP\Sync\Response;
 use OCA\Mail\Service\Search\FilterStringParser;
 use OCA\Mail\Service\Search\SearchQuery;
-use OCP\AppFramework\Db\DoesNotExistException;
 use function array_diff;
 use function array_map;
 use function end;
