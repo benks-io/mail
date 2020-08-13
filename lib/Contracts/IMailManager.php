@@ -92,7 +92,7 @@ interface IMailManager {
 	 * @throws ClientException
 	 * @throws ServiceException
 	 */
-	public function getSource(Account $account, string $mb, int $uid): string;
+	public function getSource(Account $account, string $mb, int $uid): ?string;
 
 	/**
 	 * @param Account $account

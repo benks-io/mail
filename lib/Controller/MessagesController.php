@@ -307,7 +307,7 @@ class MessagesController extends Controller {
 	 * @param string $folderId
 	 * @param int $messageId
 	 *
-	 * @return HtmlResponse|TemplateResponse
+	 * @return JSONResponse
 	 * @throws ServiceException
 	 */
 	public function getSource(int $id): JSONResponse {

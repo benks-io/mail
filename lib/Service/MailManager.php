@@ -193,7 +193,7 @@ class MailManager implements IMailManager {
 	 * @throws ClientException
 	 * @throws ServiceException
 	 */
-	public function getSource(Account $account, string $mailbox, int $uid): string {
+	public function getSource(Account $account, string $mailbox, int $uid): ?string {
 		$client = $this->imapClientFactory->getClient($account);
 
 		try {

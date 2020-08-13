@@ -113,10 +113,6 @@ class MailboxesController extends Controller {
 	 * @throws ServiceException
 	 */
 	public function sync(int $id, array $uids = [], bool $init = false, string $query = null): JSONResponse {
-		if (!is_array($uids)) {
-			return new JSONResponse(null, Http::STATUS_BAD_REQUEST);
-		}
-
 		$mailbox = $this->mailManager->getMailbox($this->currentUserId, $id);
 		$account = $this->accountService->find($this->currentUserId, $mailbox->getAccountId());
 
