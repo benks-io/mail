@@ -82,7 +82,7 @@ class MessageMapper extends QBMapper {
 	public function findByUserId(string $uid, int $id): Message {
 		$query = $this->db->getQueryBuilder();
 
-		$query->select('m.uid')
+		$query->select('m.*')
 			->from($this->getTableName(), 'm')
 			->join('m', 'mail_mailboxes', 'mb', $query->expr()->eq('m.mailbox_id', 'mb.id', IQueryBuilder::PARAM_INT))
 			->join('m', 'mail_accounts', 'a', $query->expr()->eq('mb.account_id', 'a.id', IQueryBuilder::PARAM_INT))

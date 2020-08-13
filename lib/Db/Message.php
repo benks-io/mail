@@ -126,6 +126,7 @@ class Message extends Entity implements JsonSerializable {
 		$this->bcc = new AddressList([]);
 
 		$this->addType('uid', 'integer');
+		$this->addType('mailboxId', 'integer');
 		$this->addType('sentAt', 'integer');
 		$this->addType('flagAnswered', 'bool');
 		$this->addType('flagDeleted', 'bool');

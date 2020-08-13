@@ -101,7 +101,7 @@ class MailboxMapper extends QBMapper {
 			->join('mb', 'mail_accounts', 'a', $qb->expr()->eq('mb.account_id', 'a.id', IQueryBuilder::PARAM_INT))
 			->where(
 				$qb->expr()->eq('a.user_id', $qb->createNamedParameter($uid)),
-				$qb->expr()->eq('id', $qb->createNamedParameter($id, IQueryBuilder::PARAM_INT), IQueryBuilder::PARAM_INT)
+				$qb->expr()->eq('mb.id', $qb->createNamedParameter($id, IQueryBuilder::PARAM_INT), IQueryBuilder::PARAM_INT)
 			);
 
 		try {

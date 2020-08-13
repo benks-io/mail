@@ -202,7 +202,7 @@ export default {
 						params: {
 							mailboxId: this.$route.params.mailboxId,
 							filter: this.$route.params.filter ? this.$route.params.filter : undefined,
-							threadId: first.databaseId
+							threadId: first.databaseId,
 						},
 					})
 				}

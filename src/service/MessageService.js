@@ -1,6 +1,6 @@
 import { generateUrl } from '@nextcloud/router'
 import axios from '@nextcloud/axios'
-import { curry, map } from 'ramda'
+import { curry } from 'ramda'
 
 import { parseErrorResponse } from '../http/ErrorResponseParser'
 import { convertAxiosError } from '../errors/convert'
@@ -18,7 +18,7 @@ export function fetchEnvelope(id) {
 
 	return axios
 		.get(url)
-		.then((resp) => amendEnvelopeWithIds(accountId, resp.data))
+		.then((resp) => resp.data)
 		.catch((error) => {
 			if (error.response && error.response.status === 404) {
 				return undefined
@@ -27,7 +27,7 @@ export function fetchEnvelope(id) {
 		})
 }
 
-export function fetchEnvelopes(mailboxId, query, cursor, limit) {
+export function fetchEnvelopes(accountId, mailboxId, query, cursor, limit) {
 	const url = generateUrl('/apps/mail/api/messages')
 	const params = {
 		mailboxId,
@@ -48,13 +48,12 @@ export function fetchEnvelopes(mailboxId, query, cursor, limit) {
 			params,
 		})
 		.then((resp) => resp.data)
-		.then(map(amendEnvelopeWithIds(accountId)))
 		.catch((error) => {
 			throw convertAxiosError(error)
 		})
 }
 
-export async function syncEnvelopes(id, uids, query, init = false) {
+export async function syncEnvelopes(accountId, id, uids, query, init = false) {
 	const url = generateUrl('/apps/mail/api/mailboxes/{id}/sync', {
 		id,
 	})
@@ -70,7 +69,7 @@ export async function syncEnvelopes(id, uids, query, init = false) {
 			throw new SyncIncompleteError()
 		}
 
-		const amend = amendEnvelopeWithIds(accountId, folderId)
+		const amend = amendEnvelopeWithIds(accountId)
 		return {
 			newMessages: response.data.newMessages.map(amend),
 			changedMessages: response.data.changedMessages.map(amend),
@@ -105,7 +104,7 @@ export function setEnvelopeFlag(id, flag, value) {
 	return axios
 		.put(url, {
 			flags: {
-				[flag]: value
+				[flag]: value,
 			},
 		})
 }

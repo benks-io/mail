@@ -7,7 +7,7 @@ export const createAlias = async(account, data) => {
 	return axios
 		.post(url, {
 			accountId: account.id,
-			...data
+			...data,
 		})
 		.then((resp) => resp.data)
 		.catch((e) => {

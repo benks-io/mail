@@ -127,6 +127,7 @@ class Mailbox extends Entity implements JsonSerializable {
 			'delimiter' => $this->delimiter,
 			'specialUse' => $specialUse,
 			'specialRole' => $specialUse[0] ?? 0,
+			'mailboxes' => [],
 		];
 	}
 }

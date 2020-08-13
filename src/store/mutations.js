@@ -26,6 +26,7 @@ import Vue from 'vue'
 import { buildMailboxHierarchy } from '../imap/MailboxHierarchy'
 import { havePrefix } from '../imap/MailboxPrefix'
 import { sortMailboxes } from '../imap/MailboxSorter'
+import { normalizedEnvelopeListId } from './normalization'
 import { UNIFIED_ACCOUNT_ID } from './constants'
 
 const addMailboxToState = (state, account) => (mailbox) => {

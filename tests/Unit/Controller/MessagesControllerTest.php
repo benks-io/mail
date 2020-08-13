@@ -178,18 +178,33 @@ class MessagesControllerTest extends TestCase {
 
 	public function testGetHtmlBody() {
 		$accountId = 17;
+		$mailboxId = 13;
 		$folderId = 'testfolder';
 		$messageId = 4321;
-		$message = $this->createMock(IMAPMessage::class);
-
+		$messageUid = 123;
+		$mailbox = new \OCA\Mail\Db\Mailbox();
+		$message = new \OCA\Mail\Db\Message();
+		$message->setMailboxId($mailboxId);
+		$message->setUid(123);
+		$mailbox->setAccountId($accountId);
+		$mailbox->setName($folderId);
+		$this->mailManager->expects($this->once())
+			->method('getMessage')
+			->with($this->userId, $messageId)
+			->willReturn($message);
+		$this->mailManager->expects($this->once())
+			->method('getMailbox')
+			->with($this->userId, $mailboxId)
+			->willReturn($mailbox);
 		$this->accountService->expects($this->once())
 			->method('find')
 			->with($this->equalTo($this->userId), $this->equalTo($accountId))
 			->will($this->returnValue($this->account));
+		$imapMessage = $this->createMock(IMAPMessage::class);
 		$this->mailManager->expects($this->once())
-			->method('getMessage')
-			->with($this->account, $folderId, $messageId, true)
-			->willReturn($message);
+			->method('getImapMessage')
+			->with($this->account, $mailbox, $messageId, true)
+			->willReturn($imapMessage);
 
 		$expectedResponse = new HtmlResponse('');
 		$expectedResponse->cacheFor(3600);
@@ -203,8 +218,7 @@ class MessagesControllerTest extends TestCase {
 			$expectedResponse->setContentSecurityPolicy($policy);
 		}
 
-		$actualResponse = $this->controller->getHtmlBody($accountId,
-			base64_encode($folderId), $messageId);
+		$actualResponse = $this->controller->getHtmlBody($messageId);
 
 		$this->assertEquals($expectedResponse, $actualResponse);
 	}

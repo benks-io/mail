@@ -52,9 +52,9 @@ import {
 } from '../service/AccountService'
 import {
 	create as createMailbox,
+	deleteMailbox,
 	fetchAll as fetchAllMailboxes,
 	markMailboxRead,
-	deleteMailbox,
 } from '../service/MailboxService'
 import {
 	deleteMessage,
@@ -271,7 +271,7 @@ export default {
 					)
 				)
 			)
-		)(mailboxId, query, undefined, PAGE_SIZE)
+		)(mailbox.accountId, mailboxId, query, undefined, PAGE_SIZE)
 	},
 	fetchNextEnvelopePage({ commit, getters, dispatch }, { mailboxId, query, rec = true }) {
 		const mailbox = getters.getMailbox(mailboxId)
@@ -416,7 +416,7 @@ export default {
 
 		const uids = getters.getEnvelopes(mailboxId, query).map((env) => env.uid)
 
-		return syncEnvelopes(mailboxId, uids, query, init)
+		return syncEnvelopes(mailbox.accountId, mailboxId, uids, query, init)
 			.then((syncData) => {
 				const unifiedMailbox = getters.getUnifiedMailbox(mailbox.specialRole)
 
@@ -639,6 +639,7 @@ export default {
 	async fetchMessage({ getters, commit }, id) {
 		const message = await fetchMessage(id)
 		const mailbox = getters.getMailbox(message.mailboxId)
+		console.info(message, message.mailboxId, mailbox)
 		// Only commit if not undefined (not found)
 		if (message) {
 			commit('addMessage', {
@@ -664,10 +665,10 @@ export default {
 			await deleteMessage(id)
 			const mailbox = getters.getMailbox(message.mailboxId)
 			if (!mailbox) {
-				logger.error('could not find mailbox', {id: message.mailboxId})
+				logger.error('could not find mailbox', { id: message.mailboxId })
 				return
 			}
-			commit('removeMessage', {id})
+			commit('removeMessage', { id })
 			console.debug('message removed')
 		} catch (err) {
 			console.error('could not delete message', err)

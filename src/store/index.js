@@ -65,7 +65,7 @@ export default new Vuex.Store({
 			},
 			[PRIORITY_INBOX_ID]: {
 				id: PRIORITY_INBOX_ID,
-				databaseId: UNIFIED_INBOX_ID,
+				databaseId: PRIORITY_INBOX_ID,
 				accountId: 0,
 				attributes: ['\\subscribed'],
 				isPriorityInbox: true,

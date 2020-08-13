@@ -152,7 +152,7 @@ return [
 	],
 	'resources' => [
 		'accounts' => ['url' => '/api/accounts'],
-		'aliases' => ['url' => '/api/accounts/{id}/aliases'],
+		'aliases' => ['url' => '/api/accounts/{accountId}/aliases'],
 		'autoComplete' => ['url' => '/api/autoComplete'],
 		'localAttachments' => ['url' => '/api/attachments'],
 		'mailboxes' => ['url' => '/api/mailboxes'],

@@ -81,7 +81,7 @@
 
 		<!-- submailboxes -->
 		<NavigationMailbox
-			v-for="subMailbox in subMailboxs"
+			v-for="subMailbox in subMailboxes"
 			:key="genId(subMailbox)"
 			:account="account"
 			:mailbox="subMailbox"

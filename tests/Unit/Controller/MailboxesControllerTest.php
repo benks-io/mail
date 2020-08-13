@@ -23,6 +23,7 @@ declare(strict_types=1);
 
 namespace OCA\Mail\Tests\Unit\Controller;
 
+use OCA\Mail\Db\Mailbox;
 use OCA\Mail\Service\Sync\SyncService;
 use PHPUnit\Framework\MockObject\MockObject;
 use function base64_encode;
@@ -103,7 +104,7 @@ class MailboxesControllerTest extends TestCase {
 		$expected = new JSONResponse([
 			'id' => 28,
 			'email' => 'user@example.com',
-			'folders' => [
+			'mailboxes' => [
 				$folder,
 			],
 			'delimiter' => '.',
@@ -140,16 +141,22 @@ class MailboxesControllerTest extends TestCase {
 		$account = $this->createMock(Account::class);
 		$stats = $this->createMock(FolderStats::class);
 		$accountId = 28;
+		$mailbox = new Mailbox();
+		$mailbox->setAccountId($accountId);
+		$this->mailManager->expects($this->once())
+			->method('getMailbox')
+			->with('john', 13)
+			->willReturn($mailbox);
 		$this->accountService->expects($this->once())
 			->method('find')
 			->with($this->equalTo($this->userId), $this->equalTo($accountId))
 			->willReturn($account);
 		$this->mailManager->expects($this->once())
-			->method('getFolderStats')
-			->with($this->equalTo($account), $this->equalTo('INBOX'))
+			->method('getMailboxStats')
+			->with($this->equalTo($account), $mailbox)
 			->willReturn($stats);
 
-		$response = $this->controller->stats($accountId, base64_encode('INBOX'));
+		$response = $this->controller->stats(13);
 
 		$expected = new JSONResponse($stats);
 		$this->assertEquals($expected, $response);
