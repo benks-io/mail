@@ -508,8 +508,7 @@ export default {
 				subject: this.subjectVal,
 				body: this.encrypt ? plain(this.bodyVal) : html(this.bodyVal),
 				attachments: this.attachments,
-				folderId: this.replyTo ? this.replyTo.folderId : undefined,
-				messageId: this.replyTo ? this.replyTo.uid : undefined,
+				messageId: this.replyTo ? this.replyTo.databaseId : undefined,
 				isHtml: !this.editorPlainText,
 			}
 		},

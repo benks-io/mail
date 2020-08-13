@@ -32,11 +32,11 @@
 					v-if="group.account"
 					:key="group.account.id"
 					:account="group.account"
-					:first-folder="group.folders[0]"
+					:first-mailbox="group.mailboxes[0]"
 					:is-first="isFirst(group.account)"
 					:is-last="isLast(group.account)" />
-				<template v-for="item in group.folders">
-					<NavigationFolder
+				<template v-for="item in group.mailboxes">
+					<NavigationMailbox
 						v-show="
 							!group.isCollapsible ||
 								!group.account.collapsed ||
@@ -44,12 +44,12 @@
 						"
 						:key="item.key"
 						:account="group.account"
-						:folder="item" />
-					<NavigationFolder
+						:mailbox="item" />
+					<NavigationMailbox
 						v-if="!group.account.isUnified && item.specialRole === 'inbox'"
 						:key="item.key + '-starred'"
 						:account="group.account"
-						:folder="item"
+						:mailbox="item"
 						filter="starred" />
 				</template>
 				<NavigationAccountExpandCollapse
@@ -74,7 +74,7 @@ import AppNavigationSpacer from '@nextcloud/vue/dist/Components/AppNavigationSpa
 import logger from '../logger'
 import NavigationAccount from './NavigationAccount'
 import NavigationAccountExpandCollapse from './NavigationAccountExpandCollapse'
-import NavigationFolder from './NavigationFolder'
+import NavigationMailbox from './NavigationMailbox'
 
 import AppSettingsMenu from '../components/AppSettingsMenu'
 
@@ -90,7 +90,7 @@ export default {
 		AppSettingsMenu,
 		NavigationAccount,
 		NavigationAccountExpandCollapse,
-		NavigationFolder,
+		NavigationMailbox,
 	},
 	data() {
 		return {
@@ -100,16 +100,16 @@ export default {
 	computed: {
 		menu() {
 			return this.$store.getters.accounts.map((account) => {
-				const folders = this.$store.getters.getMailboxes(account.id)
-				const nonSpecialRoleFolders = folders.filter(
-					(folder) => SHOW_COLLAPSED.indexOf(folder.specialRole) === -1
+				const mailboxes = this.$store.getters.getMailboxes(account.id)
+				const nonSpecialRoleMailboxes = mailboxes.filter(
+					(mailbox) => SHOW_COLLAPSED.indexOf(mailbox.specialRole) === -1
 				)
-				const isCollapsible = nonSpecialRoleFolders.length > 1
+				const isCollapsible = nonSpecialRoleMailboxes.length > 1
 
 				return {
 					id: account.id,
 					account,
-					folders,
+					mailboxes,
 					isCollapsible,
 				}
 			})

@@ -156,18 +156,9 @@ export default {
 			return isPgpgMessage(this.message.hasHtmlBody ? html(this.message.body) : plain(this.message.body))
 		},
 		htmlUrl() {
-			return generateUrl('/apps/mail/api/accounts/{accountId}/folders/{folderId}/messages/{uid}/html', {
-				accountId: this.message.accountId,
-				folderId: this.message.folderId,
-				uid: this.message.uid,
+			return generateUrl('/apps/mail/api/messages/{id}/html', {
+				id: this.message.databaseId,
 			})
-		},
-		replyTo() {
-			return {
-				accountId: this.message.accountId,
-				folderId: this.message.folderId,
-				messageId: this.message.uid,
-			}
 		},
 		hasMultipleRecipients() {
 			return this.replyRecipient.to.concat(this.replyRecipient.cc).length > 1
@@ -303,10 +294,8 @@ export default {
 
 			try {
 				const resp = await axios.get(
-					generateUrl('/apps/mail/api/accounts/{accountId}/folders/{folderId}/messages/{uid}/source', {
-						accountId: this.message.accountId,
-						folderId: this.message.folderId,
-						uid: this.message.uid,
+					generateUrl('/apps/mail/api/messages/{id}/source', {
+						id: this.message.databaseId,
 					})
 				)
 

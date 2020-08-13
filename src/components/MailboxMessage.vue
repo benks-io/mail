@@ -11,9 +11,9 @@
 				:infinite-scroll-distance="10"
 				@shortkey.native="onShortcut">
 				<Mailbox
-					v-if="!folder.isPriorityInbox"
+					v-if="!mailbox.isPriorityInbox"
 					:account="account"
-					:folder="folder"
+					:mailbox="mailbox"
 					:search-query="query"
 					:bus="bus" />
 				<template v-else>
@@ -32,7 +32,7 @@
 					<Mailbox
 						class="nameimportant"
 						:account="unifiedAccount"
-						:folder="unifiedInbox"
+						:mailbox="unifiedInbox"
 						:search-query="appendToSearch('is:important')"
 						:paginate="'manual'"
 						:is-priority-inbox="true"
@@ -43,7 +43,7 @@
 					<Mailbox
 						class="namestarred"
 						:account="unifiedAccount"
-						:folder="unifiedInbox"
+						:mailbox="unifiedInbox"
 						:search-query="appendToSearch('is:starred not:important')"
 						:paginate="'manual'"
 						:is-priority-inbox="true"
@@ -53,7 +53,7 @@
 					<Mailbox
 						class="nameother"
 						:account="unifiedAccount"
-						:folder="unifiedInbox"
+						:mailbox="unifiedInbox"
 						:open-first="false"
 						:search-query="appendToSearch('not:starred not:important')"
 						:is-priority-inbox="true"
@@ -107,7 +107,7 @@ export default {
 			type: Object,
 			required: true,
 		},
-		folder: {
+		mailbox: {
 			type: Object,
 			required: true,
 		},
@@ -135,10 +135,10 @@ export default {
 			return this.$store.getters.getMailbox(UNIFIED_INBOX_ID)
 		},
 		hasMessages() {
-			// it actually should be `return this.$store.getters.getEnvelopes(this.account.id, this.folder.id).length > 0`
-			// but for some reason Vue doesn't track the dependencies on reactive data then and messages in subfolders can't
+			// it actually should be `return this.$store.getters.getEnvelopes(this.account.id, this.mailbox.id).length > 0`
+			// but for some reason Vue doesn't track the dependencies on reactive data then and messages in submailboxes can't
 			// be opened then
-			const list = this.folder.envelopeLists[normalizedEnvelopeListId(this.searchQuery)]
+			const list = this.mailbox.envelopeLists[normalizedEnvelopeListId(this.searchQuery)]
 
 			if (list === undefined) {
 				return false
@@ -146,7 +146,7 @@ export default {
 			return list.length > 0
 		},
 		showMessage() {
-			return (this.folder.isPriorityInbox === true || this.hasMessages) && this.$route.name === 'message'
+			return (this.mailbox.isPriorityInbox === true || this.hasMessages) && this.$route.name === 'message'
 		},
 		query() {
 			if (this.$route.params.filter === 'starred') {
@@ -179,7 +179,7 @@ export default {
 			this.$router.replace({
 				name: 'mailbox',
 				params: {
-					mailboxId: this.folder.databaseId,
+					mailboxId: this.mailbox.databaseId,
 					filter: this.$route.params.filter ? this.$route.params.filter : undefined,
 				},
 			})

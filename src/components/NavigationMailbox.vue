@@ -22,37 +22,37 @@
 <template>
 	<AppNavigationItem
 		v-if="visible"
-		:id="genId(folder)"
-		:key="genId(folder)"
+		:id="genId(mailbox)"
+		:key="genId(mailbox)"
 		:allow-collapse="true"
 		:menu-open.sync="menuOpen"
 		:force-menu="true"
 		:icon="icon"
 		:title="title"
 		:to="to"
-		:open.sync="showSubFolders"
+		:open.sync="showSubMailboxes"
 		@update:menuOpen="onMenuToggle">
 		<!-- actions -->
 		<template slot="actions">
 			<template>
 				<ActionText
-					v-if="!account.isUnified && folder.specialRole !== 'flagged'"
+					v-if="!account.isUnified && mailbox.specialRole !== 'flagged'"
 					icon="icon-info"
-					:title="folderId">
+					:title="mailbox.name">
 					{{ statsText }}
 				</ActionText>
 
 				<ActionButton
-					v-if="folder.specialRole !== 'flagged'"
+					v-if="mailbox.specialRole !== 'flagged'"
 					icon="icon-mail"
 					:title="t('mail', 'Mark all as read')"
 					:disabled="loadingMarkAsRead"
 					@click="markAsRead">
-					{{ t('mail', 'Mark all messages of this folder as read') }}
+					{{ t('mail', 'Mark all messages of this mailbox as read') }}
 				</ActionButton>
 
 				<ActionButton
-					v-if="!editing && top && !account.isUnified && folder.specialRole !== 'flagged'"
+					v-if="!editing && top && !account.isUnified && mailbox.specialRole !== 'flagged'"
 					icon="icon-folder"
 					@click="openCreateMailbox">
 					{{ t('mail', 'Add subfolder') }}
@@ -63,28 +63,28 @@
 				</ActionText>
 
 				<ActionButton
-					v-if="debug && !account.isUnified && folder.specialRole !== 'flagged'"
+					v-if="debug && !account.isUnified && mailbox.specialRole !== 'flagged'"
 					icon="icon-settings"
 					:title="t('mail', 'Clear cache')"
 					:disabled="clearingCache"
 					@click="clearCache">
 					{{ t('mail', 'Clear locally cached data, in case there are issues with synchronization.') }}
 				</ActionButton>
-				<ActionButton v-if="!account.isUnified && !folder.specialRole" icon="icon-delete" @click="deleteFolder">
+				<ActionButton v-if="!account.isUnified && !mailbox.specialRole" icon="icon-delete" @click="deleteMailbox">
 					{{ t('mail', 'Delete folder') }}
 				</ActionButton>
 			</template>
 		</template>
-		<AppNavigationCounter v-if="folder.unread" slot="counter">
-			{{ folder.unread }}
+		<AppNavigationCounter v-if="mailbox.unread" slot="counter">
+			{{ mailbox.unread }}
 		</AppNavigationCounter>
 
-		<!-- subfolders -->
-		<NavigationFolder
-			v-for="subFolder in subFolders"
-			:key="genId(subFolder)"
+		<!-- submailboxes -->
+		<NavigationMailbox
+			v-for="subMailbox in subMailboxs"
+			:key="genId(subMailbox)"
 			:account="account"
-			:folder="subFolder"
+			:mailbox="subMailbox"
 			:top="false" />
 	</AppNavigationItem>
 </template>
@@ -103,7 +103,7 @@ import { translatePlural as n } from '@nextcloud/l10n'
 import { translate as translateMailboxName } from '../i18n/MailboxTranslator'
 
 export default {
-	name: 'NavigationFolder',
+	name: 'NavigationMailbox',
 	components: {
 		AppNavigationItem,
 		AppNavigationCounter,
@@ -116,7 +116,7 @@ export default {
 			type: Object,
 			required: true,
 		},
-		folder: {
+		mailbox: {
 			type: Object,
 			required: true,
 		},
@@ -133,12 +133,12 @@ export default {
 	data() {
 		return {
 			debug: window?.OC?.debug || false,
-			folderStats: undefined,
+			mailboxStats: undefined,
 			loadingMarkAsRead: false,
 			clearingCache: false,
 			showSaving: false,
 			editing: false,
-			showSubFolders: false,
+			showSubMailboxes: false,
 			menuOpen: false,
 		}
 	},
@@ -146,57 +146,54 @@ export default {
 		visible() {
 			return (
 				this.account.showSubscribedOnly === false
-				|| (this.folder.attributes && this.folder.attributes.includes('\\subscribed'))
+				|| (this.mailbox.attributes && this.mailbox.attributes.includes('\\subscribed'))
 			)
 		},
 		title() {
 			if (this.filter === 'starred') {
 				// Little hack to trick the translation logic into a different path
 				return translateMailboxName({
-					...this.folder,
+					...this.mailbox,
 					specialUse: ['flagged'],
 				})
 			}
-			return translateMailboxName(this.folder)
-		},
-		folderId() {
-			return atob(this.folder.id)
+			return translateMailboxName(this.mailbox)
 		},
 		icon() {
 			if (this.filter === 'starred') {
 				return 'icon-flagged'
-			} else if (this.folder.isPriorityInbox) {
+			} else if (this.mailbox.isPriorityInbox) {
 				return 'icon-important'
 			}
-			return this.folder.specialRole ? 'icon-' + this.folder.specialRole : 'icon-folder'
+			return this.mailbox.specialRole ? 'icon-' + this.mailbox.specialRole : 'icon-folder'
 		},
 		to() {
 			return {
 				name: 'mailbox',
 				params: {
-					mailboxId: this.folder.databaseId,
+					mailboxId: this.mailbox.databaseId,
 					filter: this.filter ? this.filter : undefined,
 				},
 			}
 		},
-		subFolders() {
-			return this.$store.getters.getSubMailboxes(this.folder.databaseId)
+		subMailboxes() {
+			return this.$store.getters.getSubMailboxes(this.mailbox.databaseId)
 		},
 		statsText() {
-			if (this.folderStats && 'total' in this.folderStats && 'unread' in this.folderStats) {
-				if (this.folderStats.unread === 0) {
-					return n('mail', '{total} message', '{total} messages', this.folderStats.total, {
-						total: this.folderStats.total,
+			if (this.mailboxStats && 'total' in this.mailboxStats && 'unread' in this.mailboxStats) {
+				if (this.mailboxStats.unread === 0) {
+					return n('mail', '{total} message', '{total} messages', this.mailboxStats.total, {
+						total: this.mailboxStats.total,
 					})
 				} else {
 					return n(
 						'mail',
 						'{unread} unread of {total}',
 						'{unread} unread of {total}',
-						this.folderStats.unread,
+						this.mailboxStats.unread,
 						{
-							total: this.folderStats.total,
-							unread: this.folderStats.unread,
+							total: this.mailboxStats.total,
+							unread: this.mailboxStats.unread,
 						}
 					)
 				}
@@ -206,12 +203,12 @@ export default {
 	},
 	methods: {
 		/**
-		 * Generate unique key id for a specific folder
-		 * @param {Object} folder the folder to gen id for
+		 * Generate unique key id for a specific mailbox
+		 * @param {Object} mailbox the mailbox to gen id for
 		 * @returns {string}
 		 */
-		genId(folder) {
-			return 'account-' + this.account.id + '_' + folder.id
+		genId(mailbox) {
+			return 'account-' + this.account.id + '_' + mailbox.id
 		},
 
 		/**
@@ -220,34 +217,34 @@ export default {
 		 */
 		onMenuToggle(open) {
 			if (open) {
-				this.fetchFolderStats()
+				this.fetchMailboxStats()
 			}
 		},
 
 		/**
-		 * Fetch folder unread/read stats
+		 * Fetch mailbox unread/read stats
 		 */
-		async fetchFolderStats() {
-			this.folderStats = null
-			if (this.account.isUnified || this.folder.specialRole === 'flagged') {
+		async fetchMailboxStats() {
+			this.mailboxStats = null
+			if (this.account.isUnified || this.mailbox.specialRole === 'flagged') {
 				return
 			}
 
 			try {
-				const stats = await getMailboxStatus(this.account.id, this.folder.id)
-				logger.debug('loaded folder stats', { stats })
-				this.folderStats = stats
+				const stats = await getMailboxStatus(this.account.id, this.mailbox.id)
+				logger.debug('loaded mailbox stats', { stats })
+				this.mailboxStats = stats
 			} catch (error) {
-				this.folderStats = { error: true }
-				logger.error(`could not load folder stats for ${this.folder.id}`, error)
+				this.mailboxStats = { error: true }
+				logger.error(`could not load mailbox stats for ${this.mailbox.id}`, error)
 			}
 		},
 
 		async createMailbox(e) {
 			this.editing = true
 			const name = e.target.elements[1].value
-			const withPrefix = atob(this.folder.id) + this.folder.delimiter + name
-			logger.info(`creating folder ${withPrefix} as subfolder of ${this.folder.id}`)
+			const withPrefix = atob(this.mailbox.id) + this.mailbox.delimiter + name
+			logger.info(`creating mailbox ${withPrefix} as submailbox of ${this.mailbox.id}`)
 			this.menuOpen = false
 			try {
 				await this.$store.dispatch('createMailbox', {
@@ -255,14 +252,14 @@ export default {
 					name: withPrefix,
 				})
 			} catch (error) {
-				logger.error(`could not create folder ${withPrefix}`, { error })
+				logger.error(`could not create mailbox ${withPrefix}`, { error })
 				throw error
 			} finally {
 				this.editing = false
 				this.showSaving = false
 			}
-			logger.info(`folder ${withPrefix} created`)
-			this.showSubFolders = true
+			logger.info(`mailbox ${withPrefix} created`)
+			this.showSubMailboxes = true
 		},
 		openCreateMailbox() {
 			this.editing = true
@@ -274,10 +271,10 @@ export default {
 			this.$store
 				.dispatch('markMailboxRead', {
 					accountId: this.account.id,
-					mailboxId: this.folder.databaseId,
+					mailboxId: this.mailbox.databaseId,
 				})
-				.then(() => logger.info(`folder ${this.folder.id} marked as read`))
-				.catch((error) => logger.error(`could not mark folder ${this.folder.id} as read`, { error }))
+				.then(() => logger.info(`mailbox ${this.mailbox.id} marked as read`))
+				.catch((error) => logger.error(`could not mark mailbox ${this.mailbox.id} as read`, { error }))
 				.then(() => (this.loadingMarkAsRead = false))
 		},
 		async clearCache() {
@@ -285,10 +282,10 @@ export default {
 				this.clearingCache = true
 				logger.debug('clearing message cache', {
 					accountId: this.account.id,
-					folderId: this.folder.id,
+					mailboxId: this.mailbox.databaseId,
 				})
 
-				await clearCache(this.account.id, this.folder.id)
+				await clearCache(this.account.id, this.mailbox.id)
 
 				// TODO: there might be a nicer way to handle this
 				window.location.reload(false)
@@ -296,24 +293,22 @@ export default {
 				this.clearCache = false
 			}
 		},
-		deleteFolder() {
-			const id = this.folder.id
-			logger.info('delete folder', { folder: this.folder })
+		deleteMailbox() {
+			const id = this.mailbox.id
+			logger.info('delete mailbox', { mailbox: this.mailbox })
 			OC.dialogs.confirmDestructive(
-				t('mail', 'The folder and all messages in it will be deleted.', {
-					folderId: this.folderId,
-				}),
+				t('mail', 'The folder and all messages in it will be deleted.'),
 				t('mail', 'Delete folder'),
 				{
 					type: OC.dialogs.YES_NO_BUTTONS,
-					confirm: t('mail', 'Delete folder {folderId}', { folderId: this.folderId }),
+					confirm: t('mail', 'Delete folder {name}', { name: this.mailbox.name }),
 					confirmClasses: 'error',
 					cancel: t('mail', 'Cancel'),
 				},
 				(result) => {
 					if (result) {
 						return this.$store
-							.dispatch('deleteMailbox', { mailbox: this.folder })
+							.dispatch('deleteMailbox', { mailbox: this.mailbox })
 							.then(() => {
 								logger.info(`mailbox ${id} deleted`)
 							})

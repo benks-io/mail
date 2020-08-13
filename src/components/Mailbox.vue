@@ -31,7 +31,7 @@
 	<EnvelopeList
 		v-else
 		:account="account"
-		:folder="folder"
+		:mailbox="mailbox"
 		:search-query="searchQuery"
 		:envelopes="envelopesToShow"
 		:refreshing="refreshing"
@@ -70,7 +70,7 @@ export default {
 			type: Object,
 			required: true,
 		},
-		folder: {
+		mailbox: {
 			type: Object,
 			required: true,
 		},
@@ -115,7 +115,7 @@ export default {
 	},
 	computed: {
 		envelopes() {
-			return this.$store.getters.getEnvelopes(this.folder.databaseId, this.searchQuery)
+			return this.$store.getters.getEnvelopes(this.mailbox.databaseId, this.searchQuery)
 		},
 		envelopesToShow() {
 			if (this.paginate === 'manual' && !this.expanded) {
@@ -134,7 +134,7 @@ export default {
 		account() {
 			this.loadEnvelopes()
 		},
-		folder() {
+		mailbox() {
 			this.loadEnvelopes()
 		},
 		searchQuery() {
@@ -163,8 +163,7 @@ export default {
 
 			this.$store
 				.dispatch('syncEnvelopes', {
-					accountId: this.account.id,
-					folderId: this.folder.id,
+					mailboxId: this.mailbox.databaseId,
 					query: this.searchQuery,
 					init: true,
 				})
@@ -182,7 +181,7 @@ export default {
 
 			try {
 				const envelopes = await this.$store.dispatch('fetchEnvelopes', {
-					mailboxId: this.folder.databaseId,
+					mailboxId: this.mailbox.databaseId,
 					query: this.searchQuery,
 					limit: this.initialPageSize,
 				})
@@ -195,8 +194,8 @@ export default {
 					// Show first message
 					const first = envelopes[0]
 
-					// Keep the selected account-folder combination, but navigate to the message
-					// (it's not a bug that we don't use first.accountId and first.folderId here)
+					// Keep the selected account-mailbox combination, but navigate to the message
+					// (it's not a bug that we don't use first.accountId and first.mailboxId here)
 					logger.debug('showing the first message of mailbox ' + this.$route.params.mailboxId)
 					this.$router.replace({
 						name: 'message',
@@ -247,8 +246,7 @@ export default {
 
 			try {
 				const envelopes = await this.$store.dispatch('fetchNextEnvelopePage', {
-					accountId: this.account.accountId,
-					folderId: this.folder.id,
+					mailboxId: this.mailbox.databaseId,
 					envelopes: this.envelopes,
 					query: this.searchQuery,
 				})
@@ -299,8 +297,8 @@ export default {
 					return
 				}
 
-				// Keep the selected account-folder combination, but navigate to a different message
-				// (it's not a bug that we don't use next.accountId and next.folderId here)
+				// Keep the selected account-mailbox combination, but navigate to a different message
+				// (it's not a bug that we don't use next.accountId and next.mailboxId here)
 				this.$router.push({
 					name: 'message',
 					params: {
@@ -361,7 +359,7 @@ export default {
 			try {
 				await this.$store.dispatch('syncEnvelopes', {
 					accountId: this.account.accountId,
-					folderId: this.folder.id,
+					mailboxId: this.mailbox.databaseId,
 					query: this.searchQuery,
 				})
 			} catch (error) {
@@ -395,8 +393,8 @@ export default {
 				return
 			}
 
-			// Keep the selected account-folder combination, but navigate to a different message
-			// (it's not a bug that we don't use next.accountId and next.folderId here)
+			// Keep the selected account-mailbox combination, but navigate to a different message
+			// (it's not a bug that we don't use next.accountId and next.mailboxId here)
 			this.$router.push({
 				name: 'message',
 				params: {
@@ -416,7 +414,7 @@ export default {
 		},
 		async loadMailbox() {
 			// When the account is unified or inbox, return nothing, else sync the mailbox
-			if (this.account.isUnified || this.folder.specialRole === 'inbox') {
+			if (this.account.isUnified || this.mailbox.specialRole === 'inbox') {
 				return
 			}
 			try {

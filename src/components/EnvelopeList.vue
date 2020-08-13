@@ -35,7 +35,7 @@
 				v-for="env in envelopes"
 				:key="env.databaseId"
 				:data="env"
-				:folder="folder"
+				:mailbox="mailbox"
 				:selected="isEnvelopeSelected(envelopes.indexOf(env))"
 				:select-mode="selectMode"
 				@delete="$emit('delete', env.databaseId)"
@@ -70,7 +70,7 @@ export default {
 			type: Object,
 			required: true,
 		},
-		folder: {
+		mailbox: {
 			type: Object,
 			required: true,
 		},

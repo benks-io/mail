@@ -98,7 +98,7 @@ export default {
 			type: Object,
 			required: true,
 		},
-		firstFolder: {
+		firstMailbox: {
 			type: Object,
 			required: true,
 		},
@@ -139,7 +139,7 @@ export default {
 			return {
 				name: 'mailbox',
 				params: {
-					mailboxId: this.firstFolder.databaseId,
+					mailboxId: this.firstMailbox.databaseId,
 				},
 			}
 		},

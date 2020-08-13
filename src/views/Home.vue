@@ -1,7 +1,7 @@
 <template>
 	<Content v-shortkey.once="['c']" app-name="mail" @shortkey.native="onNewMessage">
 		<Navigation />
-		<MailboxMessage v-if="activeAccount" :account="activeAccount" :folder="activeFolder" />
+		<MailboxMessage v-if="activeAccount" :account="activeAccount" :mailbox="activeMailbox" />
 	</Content>
 </template>
 
@@ -23,9 +23,9 @@ export default {
 	mixins: [isMobile],
 	computed: {
 		activeAccount() {
-			return this.$store.getters.getAccount(this.activeFolder?.accountId)
+			return this.$store.getters.getAccount(this.activeMailbox?.accountId)
 		},
-		activeFolder() {
+		activeMailbox() {
 			return this.$store.getters.getMailbox(this.$route.params.mailboxId)
 		},
 		menu() {
@@ -41,7 +41,7 @@ export default {
 				&& from.params.mailboxId === to.params.mailboxId
 				&& from.params.filter === to.params.filter
 			) {
-				logger.warn("navigation from a message to just the folder. we don't want that, do we? let's go back", {
+				logger.warn("navigation from a message to just the mailbox. we don't want that, do we? let's go back", {
 					to,
 					from,
 				})
@@ -55,15 +55,15 @@ export default {
 		if (this.$route.name === 'home' && accounts.length > 1) {
 			// Show first account
 			const firstAccount = accounts[0]
-			// FIXME: this assumes that there's at least one folder
-			const firstFolder = this.$store.getters.getMailboxes(firstAccount.id)[0]
+			// FIXME: this assumes that there's at least one mailbox
+			const firstMailbox = this.$store.getters.getMailboxes(firstAccount.id)[0]
 
-			console.debug('loading first folder of first account', firstAccount.id, firstFolder.databaseId)
+			console.debug('loading first mailbox of first account', firstAccount.id, firstMailbox.databaseId)
 
 			this.$router.replace({
 				name: 'mailbox',
 				params: {
-					mailboxId: firstFolder.databaseId,
+					mailboxId: firstMailbox.databaseId,
 				},
 			})
 		} else if (this.$route.name === 'home' && accounts.length === 1) {
@@ -79,15 +79,15 @@ export default {
 
 			// Show first account
 			const firstAccount = accounts[0]
-			// FIXME: this assumes that there's at least one folder
-			const firstFolder = this.$store.getters.getMailboxes(firstAccount.id)[0]
+			// FIXME: this assumes that there's at least one mailbox
+			const firstMailbox = this.$store.getters.getMailboxes(firstAccount.id)[0]
 
-			console.debug('loading composer with first account and folder', firstAccount.id, firstFolder.id)
+			console.debug('loading composer with first account and mailbox', firstAccount.id, firstMailbox.id)
 
 			this.$router.replace({
 				name: 'message',
 				params: {
-					mailboxId: firstFolder.databaseId,
+					mailboxId: firstMailbox.databaseId,
 					threadId: 'new',
 				},
 				query: {
