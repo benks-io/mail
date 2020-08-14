@@ -30,6 +30,36 @@ return [
 			'verb' => 'GET'
 		],
 		[
+			'name' => 'page#setup',
+			'url' => '/setup',
+			'verb' => 'GET'
+		],
+		[
+			'name' => 'page#keyboardShortcuts',
+			'url' => '/keyboard-shortcuts',
+			'verb' => 'GET'
+		],
+		[
+			'name' => 'page#accountSettings',
+			'url' => '/accounts/{id}/settings',
+			'verb' => 'GET'
+		],
+		[
+			'name' => 'page#mailbox',
+			'url' => '/box/{id}',
+			'verb' => 'GET'
+		],
+		[
+			'name' => 'page#thread',
+			'url' => '/box/{mailboxId}/thread/{id}',
+			'verb' => 'GET'
+		],
+		[
+			'name' => 'page#index',
+			'url' => '/',
+			'verb' => 'GET'
+		],
+		[
 			'name' => 'page#compose',
 			'url' => '/compose',
 			'verb' => 'GET'
