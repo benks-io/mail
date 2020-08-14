@@ -638,12 +638,9 @@ export default {
 	},
 	async fetchMessage({ getters, commit }, id) {
 		const message = await fetchMessage(id)
-		const mailbox = getters.getMailbox(message.mailboxId)
-		console.info(message, message.mailboxId, mailbox)
 		// Only commit if not undefined (not found)
 		if (message) {
 			commit('addMessage', {
-				accountId: mailbox.accountId,
 				message,
 			})
 		}

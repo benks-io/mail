@@ -81,42 +81,42 @@ return [
 		],
 		[
 			'name' => 'messages#downloadAttachment',
-			'url' => '/api/accounts/messages/{id}/attachment/{attachmentId}',
+			'url' => '/api/messages/{id}/attachment/{attachmentId}',
 			'verb' => 'GET'
 		],
 		[
 			'name' => 'messages#saveAttachment',
-			'url' => '/api/accounts/messages/{id}/attachment/{attachmentId}',
+			'url' => '/api/messages/{id}/attachment/{attachmentId}',
 			'verb' => 'POST'
 		],
 		[
 			'name' => 'messages#getBody',
-			'url' => '/api/accounts/messages/{id}/body',
+			'url' => '/api/messages/{id}/body',
 			'verb' => 'GET'
 		],
 		[
 			'name' => 'messages#getSource',
-			'url' => '/api/accounts/messages/{id}/source',
+			'url' => '/api/messages/{id}/source',
 			'verb' => 'GET'
 		],
 		[
 			'name' => 'messages#getHtmlBody',
-			'url' => '/api/accounts/messages/{id}/html',
+			'url' => '/api/messages/{id}/html',
 			'verb' => 'GET'
 		],
 		[
 			'name' => 'messages#getThread',
-			'url' => '/api/accounts/messages/{id}/thread',
+			'url' => '/api/messages/{id}/thread',
 			'verb' => 'GET'
 		],
 		[
 			'name' => 'messages#setFlags',
-			'url' => '/api/accounts/messages/{id}/flags',
+			'url' => '/api/messages/{id}/flags',
 			'verb' => 'PUT'
 		],
 		[
 			'name' => 'messages#move',
-			'url' => '/api/accounts/messages/{id}/move',
+			'url' => '/api/messages/{id}/move',
 			'verb' => 'POST'
 		],
 		[

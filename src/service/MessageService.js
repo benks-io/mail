@@ -109,20 +109,21 @@ export function setEnvelopeFlag(id, flag, value) {
 		})
 }
 
-export function fetchMessage(id) {
+export async function fetchMessage(id) {
 	const url = generateUrl('/apps/mail/api/messages/{id}/body', {
 		id,
 	})
 
-	return axios
-		.get(url)
-		.then((resp) => resp.data)
-		.catch((error) => {
-			if (error.response && error.response.status === 404) {
-				return undefined
-			}
-			return Promise.reject(parseErrorResponse(error.response))
-		})
+	try {
+		const resp = await axios.get(url)
+		return resp.data
+	} catch (err) {
+		if (error.response && error.response.status === 404) {
+			return undefined
+		}
+
+		throw parseErrorResponse(error.response)
+	}
 }
 
 export async function saveDraft(accountId, data) {

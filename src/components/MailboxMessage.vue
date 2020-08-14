@@ -168,8 +168,10 @@ export default {
 	created() {
 		this.alive = true
 
-		// eslint-disable-next-line no-new
-		new OCA.Search(this.searchProxy, this.clearSearchProxy)
+		window.addEventListener('DOMContentLoaded', (event) => {
+			// eslint-disable-next-line no-new
+			new OCA.Search(this.searchProxy, this.clearSearchProxy)
+		})
 	},
 	beforeDestroy() {
 		this.alive = false

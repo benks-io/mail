@@ -98,8 +98,6 @@ export default {
 					body: this.$route.query.body,
 				},
 			})
-		} else {
-			console.error('no route condition matched')
 		}
 	},
 	methods: {

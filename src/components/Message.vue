@@ -201,8 +201,11 @@ export default {
 				logger.debug('envelope and message fetched', { envelope, message })
 				// TODO: add timeout so that message isn't flagged when only viewed
 				//       for a few seconds
-				if (message && message.databaseId !== this.$route.params.threadId) {
-					logger.debug("User navigated away, loaded message won't be shown nor flagged as seen")
+				if (envelope && envelope.databaseId !== this.$route.params.threadId) {
+					logger.debug("User navigated away, loaded message won't be shown nor flagged as seen", {
+						messageId: envelope.databaseId,
+						threadId: this.$route.params.threadId,
+					})
 					return
 				}
 
@@ -216,7 +219,7 @@ export default {
 					return
 				}
 
-				const account = this.$store.getters.getAccount(message.accountId)
+				const account = this.$store.getters.getAccount(envelope.accountId)
 				this.replyRecipient = buildReplyRecipients(message, {
 					label: account.name,
 					email: account.emailAddress,

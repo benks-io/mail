@@ -569,9 +569,7 @@ class MessagesController extends Controller {
 									   array $attachment) {
 		$downloadUrl = $this->urlGenerator->linkToRoute('mail.messages.downloadAttachment',
 			[
-				'accountId' => $accountId,
-				'folderId' => $folderId,
-				'messageId' => $messageId,
+				'id' => $messageId,
 				'attachmentId' => $attachment['id'],
 			]);
 		$downloadUrl = $this->urlGenerator->getAbsoluteURL($downloadUrl);

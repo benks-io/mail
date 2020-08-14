@@ -53,10 +53,7 @@ export const getters = {
 		)
 	},
 	getEnvelope: (state) => (id) => {
-		// TODO: fix normalization
-		return Object.keys(state.envelopes)
-			.map(uuid => state.envelopes[uuid])
-			.filter(e => e.databaseId === id)[0]
+		return state.envelopes[id]
 	},
 	getEnvelopeByUuid: (state) => (uuid) => {
 		return state.envelopes[uuid]

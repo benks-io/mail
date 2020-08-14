@@ -42,12 +42,12 @@
 								!group.account.collapsed ||
 								SHOW_COLLAPSED.indexOf(item.specialRole) !== -1
 						"
-						:key="item.key"
+						:key="item.databaseId"
 						:account="group.account"
 						:mailbox="item" />
 					<NavigationMailbox
 						v-if="!group.account.isUnified && item.specialRole === 'inbox'"
-						:key="item.key + '-starred'"
+						:key="item.databaseId + '-starred'"
 						:account="group.account"
 						:mailbox="item"
 						filter="starred" />

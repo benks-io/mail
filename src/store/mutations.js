@@ -124,6 +124,7 @@ export default {
 	addEnvelope(state, { query, envelope }) {
 		const mailbox = state.mailboxes[envelope.mailboxId]
 		Vue.set(state.envelopes, envelope.databaseId, envelope)
+		Vue.set(envelope, 'accountId', mailbox.accountId)
 		const listId = normalizedEnvelopeListId(query)
 		const existing = mailbox.envelopeLists[listId] || []
 		const idToDateInt = (id) => state.envelopes[id].dateInt
@@ -199,8 +200,7 @@ export default {
 				}
 			})
 	},
-	addMessage(state, { accountId, message }) {
-		message.accountId = accountId
+	addMessage(state, { message }) {
 		Vue.set(state.messages, message.databaseId, message)
 	},
 	updateDraft(state, { draft, data, newUid }) {
