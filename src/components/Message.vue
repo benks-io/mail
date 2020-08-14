@@ -250,7 +250,7 @@ export default {
 					filter: this.$route.params.filter ? this.$route.params.filter : undefined,
 				},
 				query: {
-					messageId: this.message.databaseId,
+					messageId: this.$route.params.threadId,
 				},
 			})
 		},
@@ -263,7 +263,7 @@ export default {
 					filter: this.$route.params.filter ? this.$route.params.filter : undefined,
 				},
 				query: {
-					messageId: this.message.databaseId,
+					messageId: this.$route.params.threadId,
 				},
 			})
 		},
@@ -276,7 +276,7 @@ export default {
 					filter: this.$route.params.filter ? this.$route.params.filter : undefined,
 				},
 				query: {
-					messageId: this.message.databaseId,
+					messageId: this.$route.params.threadId,
 				},
 			})
 		},

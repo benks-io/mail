@@ -112,6 +112,9 @@ export default {
 				}
 			} else {
 				// New or mailto: message
+				logger.debug('composing a new message or handling a mailto link', {
+					threadId: this.$route.params.threadId,
+				})
 
 				let accountId
 				// Only preselect an account when we're not in a unified mailbox
@@ -199,14 +202,14 @@ export default {
 					}
 				})
 		},
-		async fetchOriginalMessage(uid) {
+		async fetchOriginalMessage(id) {
 			this.loading = true
 			this.error = undefined
 			this.errorMessage = ''
 
 			try {
-				const message = await this.$store.dispatch('fetchMessage', uid)
-				if (message.databaseId !== this.$route.query.messageId) {
+				const message = await this.$store.dispatch('fetchMessage', id)
+				if (message.databaseId !== this.$route.query.threadId) {
 					logger.debug("User navigated away, loaded original message won't be used")
 					return
 				}
@@ -227,7 +230,7 @@ export default {
 				}
 				this.originalBody = body
 			} catch (error) {
-				logger.error('could not load original message ' + uid, { error })
+				logger.error('could not load original message ' + id, { error })
 				if (error.isError) {
 					this.errorMessage = t('mail', 'Could not load original message')
 					this.error = error
