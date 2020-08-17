@@ -157,7 +157,7 @@ export default {
 		},
 		htmlUrl() {
 			return generateUrl('/apps/mail/api/messages/{id}/html', {
-				id: this.message.databaseId,
+				id: this.envelope.databaseId,
 			})
 		},
 		hasMultipleRecipients() {
@@ -289,7 +289,7 @@ export default {
 		onDelete() {
 			this.$emit('delete', this.envelope.databaseId)
 			this.$store.dispatch('deleteMessage', {
-				id: this.message.databaseId,
+				id: this.envelope.databaseId,
 			})
 		},
 		async onShowSource() {
@@ -298,7 +298,7 @@ export default {
 			try {
 				const resp = await axios.get(
 					generateUrl('/apps/mail/api/messages/{id}/source', {
-						id: this.message.databaseId,
+						id: this.envelope.databaseId,
 					})
 				)
 
