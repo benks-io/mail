@@ -26,7 +26,6 @@ namespace OCA\Mail\Tests\Unit\Controller;
 use OCA\Mail\Db\Mailbox;
 use OCA\Mail\Service\Sync\SyncService;
 use PHPUnit\Framework\MockObject\MockObject;
-use function base64_encode;
 use OCA\Mail\Account;
 use OCA\Mail\Contracts\IMailManager;
 use OCA\Mail\Controller\MailboxesController;

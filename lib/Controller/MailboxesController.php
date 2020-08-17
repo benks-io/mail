@@ -31,7 +31,6 @@ use OCA\Mail\Exception\IncompleteSyncException;
 use OCA\Mail\Exception\MailboxNotCachedException;
 use OCA\Mail\Exception\ServiceException;
 use OCA\Mail\Service\Sync\SyncService;
-use function is_array;
 use OCA\Mail\Contracts\IMailManager;
 use OCA\Mail\Exception\NotImplemented;
 use OCA\Mail\Service\AccountService;
