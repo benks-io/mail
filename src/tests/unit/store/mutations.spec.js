@@ -33,13 +33,14 @@ describe('Vuex store mutations', () => {
 				[UNIFIED_ACCOUNT_ID]: {
 					accountId: UNIFIED_ACCOUNT_ID,
 					id: UNIFIED_ACCOUNT_ID,
-					folders: [],
+					mailboxes: [],
 				},
 			},
 			envelopes: {},
-			folders: {
-				'13-INBOX': {
-					id: 'INBOX',
+			mailboxes: {
+				27: {
+					name: 'INBOX',
+					accountId: 13,
 					envelopeLists: {},
 				},
 			},
@@ -48,11 +49,11 @@ describe('Vuex store mutations', () => {
 		mutations.addEnvelope(state, {
 			query: undefined,
 			envelope: {
-				accountId: 13,
-				folderId: 'INBOX',
+				mailboxId: 27,
+				databaseId: 12345,
 				id: 123,
 				subject: 'henlo',
-				uid: '13-INBOX-123',
+				uid: 321,
 			},
 		})
 
@@ -61,23 +62,25 @@ describe('Vuex store mutations', () => {
 				[UNIFIED_ACCOUNT_ID]: {
 					accountId: UNIFIED_ACCOUNT_ID,
 					id: UNIFIED_ACCOUNT_ID,
-					folders: [],
+					mailboxes: [],
 				},
 			},
 			envelopes: {
-				'13-INBOX-123': {
+				12345: {
 					accountId: 13,
-					folderId: 'INBOX',
-					uid: '13-INBOX-123',
+					mailboxId: 27,
+					databaseId: 12345,
+					uid: 321,
 					id: 123,
 					subject: 'henlo',
 				},
 			},
-			folders: {
-				'13-INBOX': {
-					id: 'INBOX',
+			mailboxes: {
+				27: {
+					name: 'INBOX',
+					accountId: 13,
 					envelopeLists: {
-						'': ['13-INBOX-123'],
+						'': [12345],
 					},
 				},
 			},
@@ -95,8 +98,10 @@ describe('Vuex store mutations', () => {
 			},
 			envelopes: {},
 			mailboxes: {
-				'13-INBOX': {
-					id: 'INBOX',
+				27: {
+					name: 'INBOX',
+					databaseId: 27,
+					accountId: 2,
 					envelopeLists: {},
 					specialRole: 'inbox',
 				},
@@ -110,11 +115,10 @@ describe('Vuex store mutations', () => {
 		mutations.addEnvelope(state, {
 			query: undefined,
 			envelope: {
-				accountId: 13,
-				folderId: 'INBOX',
-				id: 123,
+				mailboxId: 27,
+				databaseId: 12345,
 				subject: 'henlo',
-				uid: '13-INBOX-123',
+				uid: 321,
 			},
 		})
 
@@ -127,26 +131,28 @@ describe('Vuex store mutations', () => {
 				},
 			},
 			envelopes: {
-				'13-INBOX-123': {
-					accountId: 13,
-					folderId: 'INBOX',
-					uid: '13-INBOX-123',
-					id: 123,
+				12345: {
+					databaseId: 12345,
+					mailboxId: 27,
+					accountId: 2,
+					uid: 321,
 					subject: 'henlo',
 				},
 			},
-			folders: {
-				'13-INBOX': {
-					id: 'INBOX',
+			mailboxes: {
+				27: {
+					name: 'INBOX',
+					databaseId: 27,
+					accountId: 2,
 					specialRole: 'inbox',
 					envelopeLists: {
-						'': ['13-INBOX-123'],
+						'': [12345],
 					},
 				},
 				[UNIFIED_INBOX_ID]: {
 					specialRole: 'inbox',
 					envelopeLists: {
-						'': ['13-INBOX-123'],
+						'': [12345],
 					},
 				},
 			},
@@ -163,20 +169,19 @@ describe('Vuex store mutations', () => {
 				},
 			},
 			envelopes: {
-				'13-INBOX-123': {
-					accountId: 13,
-					folderId: 'INBOX',
+				12345: {
+					mailboxId: 27,
 					id: 123,
-					uid: '13-INBOX-123',
+					uid: 12345,
 				},
 			},
-			folders: {
-				'13-INBOX': {
+			mailboxes: {
+				27: {
 					id: 'INBOX',
 					specialUse: ['inbox'],
 					specialRole: 'inbox',
 					envelopeLists: {
-						'': ['13-INBOX-123'],
+						'': [12345],
 					},
 				},
 				[UNIFIED_INBOX_ID]: {
@@ -184,7 +189,7 @@ describe('Vuex store mutations', () => {
 					specialUse: ['inbox'],
 					specialRole: 'inbox',
 					envelopeLists: {
-						'': ['13-INBOX-123'],
+						'': [12345],
 					},
 				},
 				[PRIORITY_INBOX_ID]: {
@@ -192,16 +197,14 @@ describe('Vuex store mutations', () => {
 					specialUse: ['inbox'],
 					specialRole: 'inbox',
 					envelopeLists: {
-						'is:starred not:important': ['13-INBOX-123'],
+						'is:starred not:important': [12345],
 					},
 				},
 			},
 		}
 
 		mutations.removeEnvelope(state, {
-			accountId: 13,
-			folderId: 'INBOX',
-			id: 123,
+			id: 12345,
 		})
 
 		expect(state).to.deep.equal({
@@ -213,15 +216,14 @@ describe('Vuex store mutations', () => {
 				},
 			},
 			envelopes: {
-				'13-INBOX-123': {
-					accountId: 13,
-					folderId: 'INBOX',
+				12345: {
+					mailboxId: 27,
 					id: 123,
-					uid: '13-INBOX-123',
+					uid: 12345,
 				},
 			},
-			folders: {
-				'13-INBOX': {
+			mailboxes: {
+				27: {
 					id: 'INBOX',
 					specialUse: ['inbox'],
 					specialRole: 'inbox',
@@ -255,12 +257,13 @@ describe('Vuex store mutations', () => {
 				13: {
 					accountId: 13,
 					id: 13,
-					mailboxes: ['13-INBOX'],
+					mailboxes: [27],
 				},
 			},
 			mailboxes: {
-				'13-INBOX': {
+				27: {
 					id: 'INBOX',
+					accountId: 13,
 					specialUse: ['inbox'],
 					specialRole: 'inbox',
 				},
@@ -268,7 +271,7 @@ describe('Vuex store mutations', () => {
 		}
 
 		mutations.removeMailbox(state, {
-			id: 'INBOX',
+			id: 27,
 		})
 
 		expect(state).to.deep.equal({
@@ -276,10 +279,10 @@ describe('Vuex store mutations', () => {
 				13: {
 					accountId: 13,
 					id: 13,
-					folders: [],
+					mailboxes: [],
 				},
 			},
-			folders: {},
+			mailboxes: {},
 		})
 	})
 
@@ -289,27 +292,29 @@ describe('Vuex store mutations', () => {
 				13: {
 					accountId: 13,
 					id: 13,
-					folders: ['13-INBOX'],
+					mailboxes: [27],
 				},
 			},
-			folders: {
-				'13-INBOX': {
+			mailboxes: {
+				27: {
 					id: 'INBOX',
+					accountId: 13,
 					specialUse: ['inbox'],
 					specialRole: 'inbox',
-					folders: ['13-INBOX.sub'],
+					mailboxes: [28],
 				},
-				'13-INBOX.sub': {
+				28: {
 					id: 'INBOX.sub',
+					accountId: 13,
 					specialUse: ['inbox'],
 					specialRole: 'inbox',
-					folders: [],
+					mailboxes: [],
 				},
 			},
 		}
 
 		mutations.removeMailbox(state, {
-			id: 'INBOX.sub',
+			id: 28,
 		})
 
 		expect(state).to.deep.equal({
@@ -317,15 +322,16 @@ describe('Vuex store mutations', () => {
 				13: {
 					accountId: 13,
 					id: 13,
-					folders: ['13-INBOX'],
+					mailboxes: [27],
 				},
 			},
-			folders: {
-				'13-INBOX': {
+			mailboxes: {
+				27: {
 					id: 'INBOX',
+					accountId: 13,
 					specialUse: ['inbox'],
 					specialRole: 'inbox',
-					folders: [],
+					mailboxes: [],
 				},
 			},
 		})

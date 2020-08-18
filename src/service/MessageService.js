@@ -117,7 +117,7 @@ export async function fetchMessage(id) {
 	try {
 		const resp = await axios.get(url)
 		return resp.data
-	} catch (err) {
+	} catch (error) {
 		if (error.response && error.response.status === 404) {
 			return undefined
 		}

@@ -111,7 +111,13 @@ export default {
 	},
 	removeMailbox(state, { id }) {
 		const mailbox = state.mailboxes[id]
+		if (mailbox === undefined) {
+			throw new Error(`Mailbox ${id} does not exist`)
+		}
 		const account = state.accounts[mailbox.accountId]
+		if (account === undefined) {
+			throw new Error(`Account ${mailbox.accountId} of mailbox ${id} is unknown`)
+		}
 		Vue.delete(state.mailboxes, id)
 		account.mailboxes = account.mailboxes.filter((mbId) => mbId !== id)
 		account.mailboxes.forEach((fId) => {

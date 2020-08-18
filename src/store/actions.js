@@ -72,7 +72,7 @@ import { matchError } from '../errors/match'
 import SyncIncompleteError from '../errors/SyncIncompleteError'
 import MailboxLockedError from '../errors/MailboxLockedError'
 import { wait } from '../util/wait'
-import { UNIFIED_ACCOUNT_ID, UNIFIED_INBOX_ID } from './constants'
+import { UNIFIED_INBOX_ID } from './constants'
 
 const PAGE_SIZE = 20
 
@@ -81,7 +81,7 @@ const sliceToPage = slice(0, PAGE_SIZE)
 const findIndividualMailboxes = curry((getMailboxes, specialRole) =>
 	pipe(
 		filter(complement(prop('isUnified'))),
-		map(prop('accountId')),
+		map(prop('id')),
 		map(getMailboxes),
 		flatten,
 		filter(propEq('specialRole', specialRole))
@@ -311,13 +311,13 @@ export default {
 					findIndividualMailboxes(getters.getMailboxes, mailbox.specialRole),
 					filter(needsFetch(query, nextLocalUnifiedEnvelopePage(accounts)))
 				)(accounts)
-			const fs = mailboxesToFetch(getters.accounts)
+			const mbs = mailboxesToFetch(getters.accounts)
 
-			if (rec && fs.length) {
+			if (rec && mbs.length) {
 				return pipe(
 					map((mb) =>
 						dispatch('fetchNextEnvelopePage', {
-							mailboxId: mb.mailboxId,
+							mailboxId: mb.databaseId,
 							query,
 						})
 					),
@@ -329,7 +329,7 @@ export default {
 							rec: false,
 						})
 					)
-				)(fs)
+				)(mbs)
 			}
 
 			const page = nextLocalUnifiedEnvelopePage(getters.accounts)
@@ -352,7 +352,7 @@ export default {
 			console.error('mailbox is empty', list)
 			return Promise.reject(new Error('Local mailbox has no envelopes, cannot determine cursor'))
 		}
-		const lastEnvelope = getters.getEnvelopeByUuid(lastEnvelopeId)
+		const lastEnvelope = getters.getEnvelope(lastEnvelopeId)
 		if (typeof lastEnvelope === 'undefined') {
 			return Promise.reject(new Error('Cannot find last envelope. Required for the mailbox cursor'))
 		}
@@ -475,7 +475,6 @@ export default {
 							const list = mailbox.envelopeLists[normalizedEnvelopeListId(undefined)]
 							if (list === undefined) {
 								await dispatch('fetchEnvelopes', {
-									accountId: account.id,
 									mailboxId: mailbox.databaseId,
 								})
 							}
@@ -501,7 +500,6 @@ export default {
 				const list = mailbox.envelopeLists[normalizedEnvelopeListId(query)]
 				if (list === undefined) {
 					await dispatch('fetchEnvelopes', {
-						accountId: UNIFIED_ACCOUNT_ID,
 						mailboxId: UNIFIED_INBOX_ID,
 						query,
 					})

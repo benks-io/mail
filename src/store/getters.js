@@ -55,9 +55,6 @@ export const getters = {
 	getEnvelope: (state) => (id) => {
 		return state.envelopes[id]
 	},
-	getEnvelopeByUuid: (state) => (uuid) => {
-		return state.envelopes[uuid]
-	},
 	getEnvelopes: (state, getters) => (mailboxId, query) => {
 		const list = getters.getMailbox(mailboxId).envelopeLists[normalizedEnvelopeListId(query)] || []
 		return list.map((msgId) => state.envelopes[msgId])
